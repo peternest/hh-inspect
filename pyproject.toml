@@ -1,0 +1,84 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hh-inspect"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Peter Huggy", email = "peter.huggy@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "matplotlib>=3.10.3",
+    "numpy>=2.2.5",
+    "pandas>=2.2.3",
+    "requests>=2.32.3",
+    "scikit-learn>=1.6.1",
+    "scipy>=1.15.3",
+    "seaborn>=0.13.2",
+    "tqdm>=4.67.1",
+]
+
+[project.scripts]
+hh-inspect = "hh_inspect:main"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
+    "pytest>=8.3.5",
+    "ruff>=0.11.9",
+    "types-requests>=2.32.0.20250515",
+]
+
+[tool.ruff]
+fix = true
+line-length = 120
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "ANN401",  # dynamically typed expressions (typing.Any) are disallowed in `{}`
+    "COM812",  # trailing comma missing
+    "D1",  # missing docstring in ...
+    "D203",  # 1 blank line required before class docstring
+    "D213",  # multi-line docstring summary should start at the second line
+    "DTZ001",  # the use of `datetime.datetime()` without `tzinfo` argument is not allowed
+    "DTZ011",  # `datetime.date.today()` used
+    "FBT",  # boolean type position ...
+    "G004",  # using of f-strings to format logging messages
+    "PTH123",  # `open()` should be replaced by `Path.open()`
+    "RUF002",  # docstring contains ambiguous `{}`
+    "RUF003",  # comment contains ambiguous `{}`
+    "T201",  # `print` found
+    "TRY003"  # avoid specifying long messages outside the exception class
+]
+
+[tool.ruff.lint.isort]
+no-lines-before = ["standard-library", "local-folder"]
+known-third-party = []
+known-local-folder = []
+lines-after-imports = 2
+
+[tool.ruff.lint.per-file-ignores]
+"src/tests/*.py" = [
+    "PLR2004",  # magic value used in comparison, consider replacing {} with constant variable
+    "S101",  # use of `assert` detected 
+    "S311"  # standard pseudo-random generators are not suitable for cryptographic purposes
+]
+
+[tool.pytest.ini_options]
+addopts = [
+    "--color=no",
+    "--import-mode=importlib", # both modes work
+]
+pythonpath = "src"
+python_files = "test*.py"
+testpaths = [
+    "src/tests",
+]
