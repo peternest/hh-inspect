@@ -1,3 +1,4 @@
+import logging
 import re
 from dataclasses import dataclass
 from typing import Any, Final, LiteralString
@@ -9,6 +10,8 @@ from hh_inspect.options import Options
 
 
 REQUEST_TIMEOUT: Final = 5
+
+log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -137,5 +140,5 @@ class DataCollector:
             return x
 
         encoded_query: Final = urlencode(query)
-        print(f"[DEBUG] {encoded_query}")
+        log.debug(f"Encoded query: {encoded_query}")
         return encoded_query

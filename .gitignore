@@ -8,9 +8,6 @@ __pycache__/
 .venv
 env/
 venv/
-ENV/
-env.bak/
-venv.bak/
 
 .git
 .vscode
@@ -22,4 +19,6 @@ venv.bak/
 src/data/*
 src/unused/*
 src/tests/*
+**/*.log
+
 TODO.md
