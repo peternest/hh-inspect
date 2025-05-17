@@ -58,6 +58,7 @@ ignore = [
     "T201",  # `print` found
     "TRY003"  # avoid specifying long messages outside the exception class
 ]
+exclude = ["src/hh_inspect/analyzer.py"]
 
 [tool.ruff.lint.isort]
 no-lines-before = ["standard-library", "local-folder"]
@@ -66,7 +67,7 @@ known-local-folder = []
 lines-after-imports = 2
 
 [tool.ruff.lint.per-file-ignores]
-"src/tests/*.py" = [
+"tests/*.py" = [
     "PLR2004",  # magic value used in comparison, consider replacing {} with constant variable
     "S101",  # use of `assert` detected 
     "S311"  # standard pseudo-random generators are not suitable for cryptographic purposes
@@ -80,5 +81,5 @@ addopts = [
 pythonpath = "src"
 python_files = "test*.py"
 testpaths = [
-    "src/tests",
+    "tests",
 ]

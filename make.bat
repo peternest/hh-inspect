@@ -16,19 +16,19 @@ goto help
 
 :format
 echo Formatting code...
-uv run ruff format src/hh_inspect src/tests
+uv run ruff format src/hh_inspect tests
 goto end
 
 :check
 echo Running checks...
-uv run ruff check src/hh_inspect src/tests
+uv run ruff check src/hh_inspect tests
 rem uv run mypy src --show-error-context --pretty
 goto end
 
 :test
 echo Running tests...
-uv run pytest src/tests
-rem uv run pytest src/tests --cov=radio --cov-report=term-missing
+uv run pytest tests
+rem uv run pytest tests --cov=hh-inspect --cov-report=term-missing
 goto end
 
 :run
