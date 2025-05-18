@@ -22,6 +22,8 @@ goto end
 :check
 echo Running checks...
 uv run ruff check src/hh_inspect tests
+rem uv run pyright src/hh_inspect tests
+rem .venv\Scripts\pyright --pythonpath .venv\Scripts\python src/hh_inspect tests
 rem uv run mypy src --show-error-context --pretty
 goto end
 
