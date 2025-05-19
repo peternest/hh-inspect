@@ -12,20 +12,23 @@ _TAX_RATE: Final = 0.13
 logger = logging.getLogger(__name__)
 
 
-# Optional fields in models are marked according to specification at
+# Some optional fields in models are marked according to specification at
 # https://api.hh.ru/openapi/redoc#tag/Vakansii/operation/get-vacancy
 
 
 @dataclass
 class BasicVacancy:
-    """Only necessary fields from FullVacancy for further analysis."""
+    """Only necessary fields from FullVacancy for further analysis.
+
+    salary_from, salary_to = values are after taxes (0 means None)
+    """
 
     vacancy_id: str
     vacancy_name: str
     employer_name: str
     region: str
-    salary_from: int | None  # salary after taxes paid
-    salary_to: int | None
+    salary_from: int
+    salary_to: int
     experience: str
     employment: str
     schedule: str
@@ -51,11 +54,11 @@ class Area:
 
 @dataclass
 class Employer:
-    id: str | None
+    id: str
     name: str
     trusted: bool
-    accredited_it_employer: bool | None
-    url: str | None
+    accredited_it_employer: bool
+    url: str
 
 
 @dataclass
@@ -82,16 +85,16 @@ class FullVacancy:
     vacancy_name: str  # original 'name'
     employer: Employer | None
     area: Area
-    employment: str | None
+    employment: str
     experience: str
     key_skills: list[str]
     professional_roles: list[ProfessionalRole]
     salary_range: SalaryRange | None
-    schedule: str | None
+    schedule: str
     description: str = field(repr=False)
     type: str
     published_at: str
-    vacancy_url: str  # original 'alternate_url'
+    vacancy_url: str = field(repr=False)  # original 'alternate_url'
 
     def to_basic_vacancy(self) -> BasicVacancy:
         salary_from, salary_to = _extract_and_calc_salary(self.salary_range)
@@ -99,7 +102,7 @@ class FullVacancy:
         return BasicVacancy(
             vacancy_id=self.vacancy_id,
             vacancy_name=self.vacancy_name,
-            employer_name=self.employer.name,
+            employer_name=(self.employer.name if self.employer is not None else ""),
             region=self.area.name,
             salary_from=salary_from,
             salary_to=salary_to,
@@ -112,26 +115,26 @@ class FullVacancy:
         )
 
 
-def parse_vacancy_data(vacancy_json: Any) -> FullVacancy:
-    def _get_subfield_value(data: dict[str, Any] | None, field1: str, field2: str) -> str:
+def parse_vacancy_data(vac_json: Any) -> FullVacancy:
+    def _get_subfield_value(vac_json: Any, field1: str, field2: str) -> str:
         """Return value of a dict subobject or "" if missing.
 
-        Example: data.get("frequency", {}).get("name")
+        Example: json = {"frequency": {"name": "zzz"}} or {"frequency": null}
         """
-        maybe_dict = data.get(field1)
-        if maybe_dict is not None:
-            return maybe_dict.get(field2, "")
+        dict_or_none = vac_json.get(field1)
+        if isinstance(dict_or_none, dict):
+            return str(dict_or_none.get(field2, ""))
         return ""
 
     def parse_employer(data: dict[str, Any] | None) -> Employer | None:
         if not data:
             return None
         return Employer(
-            id=data.get("id"),
+            id=data.get("id", ""),
             name=data.get("name", ""),
             trusted=data.get("trusted", False),
-            accredited_it_employer=data.get("accredited_it_employer"),
-            url=data.get("url"),
+            accredited_it_employer=data.get("accredited_it_employer", False),
+            url=data.get("url", ""),
         )
 
     def parse_salary_range(data: dict[str, Any] | None) -> SalaryRange | None:
@@ -158,49 +161,43 @@ def parse_vacancy_data(vacancy_json: Any) -> FullVacancy:
         ]
 
     return FullVacancy(
-        vacancy_id=vacancy_json.get("id", ""),
-        vacancy_name=vacancy_json.get("name", ""),
+        vacancy_id=vac_json.get("id", ""),
+        vacancy_name=vac_json.get("name", ""),
         area=Area(
-            id=vacancy_json["area"]["id"],
-            name=vacancy_json["area"]["name"],
-            url=vacancy_json["area"]["url"],
+            id=vac_json["area"]["id"],
+            name=vac_json["area"]["name"],
+            url=vac_json["area"]["url"],
         ),
-        description=vacancy_json.get("description", ""),
-        employer=parse_employer(vacancy_json.get("employer")),
-        employment=_get_subfield_value(vacancy_json, "employment", "name"),
-        experience=_get_subfield_value(vacancy_json, "experience", "name"),
-        key_skills=[skill["name"] for skill in vacancy_json.get("key_skills", [])],
-        professional_roles=parse_professional_roles(vacancy_json.get("professional_roles")),
-        salary_range=parse_salary_range(vacancy_json.get("salary_range")),
-        schedule=_get_subfield_value(vacancy_json, "schedule", "name"),
-        type=_get_subfield_value(vacancy_json, "type", "name"),
-        published_at=vacancy_json.get("published_at", ""),
-        vacancy_url=vacancy_json.get("alternate_url", ""),
+        description=vac_json.get("description", ""),
+        employer=parse_employer(vac_json.get("employer")),
+        employment=_get_subfield_value(vac_json, "employment", "name"),
+        experience=_get_subfield_value(vac_json, "experience", "name"),
+        key_skills=[skill["name"] for skill in vac_json.get("key_skills", [])],
+        professional_roles=parse_professional_roles(vac_json.get("professional_roles")),
+        salary_range=parse_salary_range(vac_json.get("salary_range")),
+        schedule=_get_subfield_value(vac_json, "schedule", "name"),
+        type=_get_subfield_value(vac_json, "type", "name"),
+        published_at=vac_json.get("published_at", ""),
+        vacancy_url=vac_json.get("alternate_url", ""),
     )
 
 
-def _extract_and_calc_salary(salary_range: SalaryRange | None) -> tuple[int | None, int | None]:
+def _extract_and_calc_salary(salary_range: SalaryRange | None) -> tuple[int, int]:
     if salary_range is None:
-        return (None, None)
+        return (0, 0)
 
     salary_dict: Final = asdict(salary_range)
     currency: Final[str] = salary_dict.get("currency", "")
     rate: Final = EXCHANGE_RATES.get(currency, 1.0)
     gross_coef: Final = (1 - _TAX_RATE) if salary_dict.get("gross") else 1
 
-    salary_from: int | None = None
-    if salary_dict.get("from_") is not None:
-        salary_from = int(salary_dict.get("from_") * rate * gross_coef)
-
-    salary_to: int | None = None
-    if salary_dict.get("to") is not None:
-        salary_to = int(salary_dict.get("to") * rate * gross_coef)
-
+    salary_from = int(salary_dict.get("from_", 0) * rate * gross_coef)
+    salary_to = int(salary_dict.get("to", 0) * rate * gross_coef)
     return (salary_from, salary_to)
 
 
 def save_vacancies_to_json(vacancies: list[BasicVacancy], filename: str) -> None:
     with open(filename, "w", encoding="utf-8") as fp:
         for vacancy in vacancies:
-            vac_str: Final = json.dumps(asdict(vacancy), ensure_ascii=False, indent=2)
+            vac_str = json.dumps(asdict(vacancy), ensure_ascii=False, indent=2)
             fp.write(f"{vac_str}\n")

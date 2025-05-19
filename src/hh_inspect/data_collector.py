@@ -31,6 +31,8 @@ class DataCollector:
 
     def collect_vacancies(self) -> list[BasicVacancy]:
         num_pages: Final = self._get_num_pages()
+        if num_pages == 0:
+            return []
         vacancy_ids: Final = self._build_vacancy_ids(num_pages)
         return self._build_vacancy_list(vacancy_ids)
 
@@ -46,10 +48,10 @@ class DataCollector:
         response = requests.get(url, timeout=REQUEST_TIMEOUT)
         if response.status_code != RESPONSE_OK:
             logger.error(f"Code: {response.status_code}")
-            return []
+            return 0
 
-        found: Final = response.json()["found"]
-        num_pages: Final = response.json()["pages"]
+        found: Final[int] = response.json().get("found", 0)
+        num_pages: Final[int] = response.json().get("pages", 0)
         logger.info(f"found: {found}, num_pages: {num_pages}")
         print(f"Found: {found}")
         return num_pages
