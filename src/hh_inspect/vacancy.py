@@ -1,3 +1,4 @@
+import json
 import logging
 from dataclasses import asdict, dataclass, field
 from typing import Any, Final
@@ -196,3 +197,10 @@ def _extract_and_calc_salary(salary_range: SalaryRange | None) -> tuple[int | No
         salary_to = int(salary_dict.get("to") * rate * gross_coef)
 
     return (salary_from, salary_to)
+
+
+def save_vacancies_to_json(vacancies: list[BasicVacancy], filename: str) -> None:
+    with open(filename, "w", encoding="utf-8") as fp:
+        for vacancy in vacancies:
+            vac_str: Final = json.dumps(asdict(vacancy), ensure_ascii=False, indent=2)
+            fp.write(f"{vac_str}\n")
