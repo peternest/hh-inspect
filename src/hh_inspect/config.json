@@ -1,6 +1,4 @@
 {
-  "num_workers": 3,
-
   "query_params": {
     "text": "Data Scientist",
     "area": 2,
@@ -8,11 +6,8 @@
     "per_page": 50
   },
 
-  "exchange_rates": {
-    "USD": 0.0122,
-    "EUR": 0.0105,
-    "RUR": 1
-  },
+  "num_workers": 3,
 
-  "save_results_to_csv": false
+  "save_results_to_csv": false,
+  "sava_results_to_json": false
 }

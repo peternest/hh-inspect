@@ -1,19 +1,43 @@
-from dataclasses import dataclass, field
-from typing import Any, Final, LiteralString
+import logging
+from dataclasses import asdict, dataclass, field
+from typing import Any, Final
 
-import requests
+from hh_inspect.options import EXCHANGE_RATES
+from hh_inspect.utils import remove_html_tags
 
 
-REQUEST_TIMEOUT: Final = 5
-RESPONSE_OK: Final = 200
+_TAX_RATE: Final = 0.13
 
-_API_BASE_URL: Final[LiteralString] = "https://api.hh.ru/vacancies/"
+logger = logging.getLogger(__name__)
 
-# Optional fields are marked according to specification at
+
+# Optional fields in models are marked according to specification at
 # https://api.hh.ru/openapi/redoc#tag/Vakansii/operation/get-vacancy
 
 
-# TypedDict would be good to make more precise check!
+@dataclass
+class BasicVacancy:
+    """Only necessary fields from FullVacancy for further analysis."""
+
+    vacancy_id: str
+    vacancy_name: str
+    employer_name: str
+    region: str
+    salary_from: int | None  # salary after taxes paid
+    salary_to: int | None
+    experience: str
+    employment: str
+    schedule: str
+    key_skills: list[str]
+    description: str
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"{self.vacancy_id}, {self.vacancy_name}, {self.employer_name}, "
+            f"({self.salary_from}, {self.salary_to})"
+            f")"
+        )
 
 
 @dataclass
@@ -39,17 +63,9 @@ class ProfessionalRole:
 
 
 @dataclass
-class Salary:
-    currency: str | None
-    from_: int | None = field(metadata={"name": "from"})
-    to: int | None
-    gross: bool | None
-
-
-@dataclass
 class SalaryRange:
     currency: str
-    frequency: str | None  # original frequency.name
+    frequency: str  # original frequency.name
     from_: int | None = field(metadata={"name": "from"})
     to: int | None
     gross: bool
@@ -57,35 +73,52 @@ class SalaryRange:
 
 
 @dataclass
-class Vacancy:
+class FullVacancy:
+    """Most important vacancy fields from HH API."""
+
     vacancy_id: str  # original 'id'
     vacancy_name: str  # original 'name'
-    area: Area
-    description: str
     employer: Employer | None
-    employment: str | None  # deprecated
+    area: Area
+    employment: str | None
     experience: str
     key_skills: list[str]
     professional_roles: list[ProfessionalRole]
-    salary: Salary | None  # deprecated
     salary_range: SalaryRange | None
-    schedule: str | None  # deprecated
+    schedule: str | None
+    description: str = field(repr=False)
     type: str
     published_at: str
 
+    def to_basic_vacancy(self) -> BasicVacancy:
+        salary_from, salary_to = _extract_and_calc_salary(self.salary_range)
 
-def get_vacancy_or_404(vacancy_id: str) -> None:
-    url: Final = f"{_API_BASE_URL}{vacancy_id}"
-    response: Final = requests.get(url, timeout=REQUEST_TIMEOUT)
-    vacancy_json: Final = response.json()
-    # print(response.status_code, json.dumps(vacancy_json, ensure_ascii=False, indent=2))
+        return BasicVacancy(
+            vacancy_id=self.vacancy_id,
+            vacancy_name=self.vacancy_name,
+            employer_name=self.employer.name,
+            region=self.area.name,
+            salary_from=salary_from,
+            salary_to=salary_to,
+            experience=self.experience,
+            employment=self.employment,
+            schedule=self.schedule,
+            key_skills=self.key_skills,
+            description=remove_html_tags(self.description),
+        )
 
-    if response.status_code == RESPONSE_OK:
-        vac = parse_vacancy(vacancy_json)
-        print(vac)
 
+def parse_vacancy_data(vacancy_json: Any) -> FullVacancy:
+    def _get_subfield_value(data: dict[str, Any] | None, field1: str, field2: str) -> str:
+        """Return value of a dict subobject or "" if missing.
 
-def parse_vacancy(vacancy_json: Any) -> Vacancy:
+        Example: data.get("frequency", {}).get("name")
+        """
+        maybe_dict = data.get(field1)
+        if maybe_dict is not None:
+            return maybe_dict.get(field2, "")
+        return ""
+
     def parse_employer(data: dict[str, Any] | None) -> Employer | None:
         if not data:
             return None
@@ -97,26 +130,16 @@ def parse_vacancy(vacancy_json: Any) -> Vacancy:
             url=data.get("url"),
         )
 
-    def parse_salary(data: dict[str, Any] | None) -> Salary | None:
-        if not data:
-            return None
-        return Salary(
-            currency=data.get("currency"),
-            from_=data.get("from"),
-            to=data.get("to"),
-            gross=data.get("gross"),
-        )
-
     def parse_salary_range(data: dict[str, Any] | None) -> SalaryRange | None:
         if not data:
             return None
         return SalaryRange(
             currency=data.get("currency", ""),
-            frequency=data.get("frequency", {}).get("name"),
+            frequency=_get_subfield_value(data, "frequency", "name"),
             from_=data.get("from"),
             to=data.get("to"),
             gross=data.get("gross", False),
-            mode=data.get("mode", {}).get("name", ""),
+            mode=_get_subfield_value(data, "mode", "name"),
         )
 
     def parse_professional_roles(data: list[dict[str, Any]] | None) -> list[ProfessionalRole]:
@@ -130,7 +153,7 @@ def parse_vacancy(vacancy_json: Any) -> Vacancy:
             for role in data
         ]
 
-    return Vacancy(
+    return FullVacancy(
         vacancy_id=vacancy_json.get("id", ""),
         vacancy_name=vacancy_json.get("name", ""),
         area=Area(
@@ -140,17 +163,32 @@ def parse_vacancy(vacancy_json: Any) -> Vacancy:
         ),
         description=vacancy_json.get("description", ""),
         employer=parse_employer(vacancy_json.get("employer")),
-        employment=vacancy_json.get("employment", {}).get("name"),
-        experience=vacancy_json.get("experience", {}).get("name", ""),
+        employment=_get_subfield_value(vacancy_json, "employment", "name"),
+        experience=_get_subfield_value(vacancy_json, "experience", "name"),
         key_skills=[skill["name"] for skill in vacancy_json.get("key_skills", [])],
         professional_roles=parse_professional_roles(vacancy_json.get("professional_roles")),
-        salary=parse_salary(vacancy_json.get("salary")),
         salary_range=parse_salary_range(vacancy_json.get("salary_range")),
-        schedule=vacancy_json.get("schedule", {}).get("name"),
-        type=vacancy_json.get("type", {}).get("name", ""),
+        schedule=_get_subfield_value(vacancy_json, "schedule", "name"),
+        type=_get_subfield_value(vacancy_json, "type", "name"),
         published_at=vacancy_json.get("published_at", ""),
     )
 
 
-if __name__ == "__main__":
-    get_vacancy_or_404("120596707")
+def _extract_and_calc_salary(salary_range: SalaryRange | None) -> tuple[int | None, int | None]:
+    if salary_range is None:
+        return (None, None)
+
+    salary_dict: Final = asdict(salary_range)
+    currency: Final[str] = salary_dict.get("currency", "")
+    rate: Final = EXCHANGE_RATES.get(currency, 1.0)
+    gross_coef: Final = (1 - _TAX_RATE) if salary_dict.get("gross") else 1
+
+    salary_from: int | None = None
+    if salary_dict.get("from_") is not None:
+        salary_from = int(salary_dict.get("from_") * rate * gross_coef)
+
+    salary_to: int | None = None
+    if salary_dict.get("to") is not None:
+        salary_to = int(salary_dict.get("to") * rate * gross_coef)
+
+    return (salary_from, salary_to)
