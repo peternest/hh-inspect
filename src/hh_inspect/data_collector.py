@@ -1,6 +1,5 @@
 import logging
-from typing import Any, Final, LiteralString
-from urllib.parse import urlencode
+from typing import Final, LiteralString
 
 import requests
 
@@ -15,49 +14,63 @@ _API_BASE_URL: Final[LiteralString] = "https://api.hh.ru/vacancies/"
 
 logger = logging.getLogger(__name__)
 
-_DICT_KEYS: Final = (
-    "Ids",
-    "Employer",
-    "Name",
-    "Salary",
-    "From",
-    "To",
-    "Experience",
-    "Schedule",
-    "Keys",
-    "Description",
-)
+
+# Query params in Enum or class (per_page, text)!
+
+PER_PAGE: Final[LiteralString] = "per_page"
+TEXT: Final[LiteralString] = "text"
 
 
 class DataCollector:
     def __init__(self, options: Options) -> None:
-        self.query_params = options.query_params
+        self.base_query_string = options.base_query_string
 
         self.num_workers = 1
         if options.num_workers is not None and options.num_workers > 1:
             self.num_workers = options.num_workers
 
     def collect_vacancies(self) -> list[BasicVacancy]:
-        url_params: Final = self._encode_query_for_url(self.query_params)
-        url: Final = f"{_API_BASE_URL}?{url_params}"
+        num_pages: Final = self._get_num_pages()
+        vacancy_ids: Final = self._build_vacancy_ids(num_pages)
+        return self._build_vacancy_list(vacancy_ids)
+
+    def _build_url(self, per_page: int = 50) -> str:
+        additional_params: Final = f"&text=Python&per_page={per_page}"
+        final_url: Final = f"{_API_BASE_URL}?{self.base_query_string}{additional_params}"
+        logger.info(f"Requesting '{final_url}'")
+        return final_url
+
+    def _get_num_pages(self) -> int:
+        url: Final = self._build_url()
 
         response = requests.get(url, timeout=REQUEST_TIMEOUT)
         if response.status_code != RESPONSE_OK:
-            logger.error(f"Code: {response.status_code}, url: {url_params}")
+            logger.error(f"Code: {response.status_code}")
             return []
 
-        num_pages = response.json()["pages"]
-        # build vacancy ids
+        found: Final = response.json()["found"]
+        num_pages: Final = response.json()["pages"]
+        logger.info(f"found: {found}, num_pages: {num_pages}")
+        print(f"Found: {found}")
+        return num_pages
+
+    def _build_vacancy_ids(self, num_pages: int) -> list[str]:
+        url: Final = self._build_url()
+
         ids: list[str] = []
         for idx in range(num_pages + 1):
             response = requests.get(url, {"page": idx}, timeout=REQUEST_TIMEOUT)
             data = response.json()
+            if response.status_code != RESPONSE_OK:
+                logger.error(f"Code: {response.status_code}")
             if "items" not in data:
                 break
             ids.extend(x["id"] for x in data["items"])
+        return ids
 
+    def _build_vacancy_list(self, vacancy_ids: list[str], max_limit: int = 10) -> list[BasicVacancy]:
         vacancy_list: list[BasicVacancy] = []
-        for vacancy_id in ids:
+        for vacancy_id in vacancy_ids[:max_limit]:
             vacancy = self.get_vacancy_or_404(vacancy_id)
             if vacancy is not None:
                 vacancy_list.append(vacancy)
@@ -73,28 +86,9 @@ class DataCollector:
         if response.status_code == RESPONSE_OK:
             full_vac = parse_vacancy_data(vacancy_json)
             vacancy = full_vac.to_basic_vacancy()
-            print(f"{full_vac}\n")
-            # print(f"{vacancy}\n")  # noqa: ERA001
+            print(f"{vacancy}")
             return vacancy
         return None
-
-    @staticmethod
-    def _encode_query_for_url(query: dict[str, Any] | None) -> str:
-        if query is None:
-            return ""
-
-        if False:  # "professional_roles" in query:
-            query_copy = query.copy()
-
-            roles = "&".join([f"professional_role={r}" for r in query_copy.pop("professional_roles")])
-
-            x = roles + (f"&{urlencode(query_copy)}" if len(query_copy) > 0 else "")
-            print(x)
-            return x
-
-        encoded_query: Final = urlencode(query)
-        logger.debug(f"Encoded query: {encoded_query}")
-        return encoded_query
 
 
 if __name__ == "__main__":

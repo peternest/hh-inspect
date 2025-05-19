@@ -1,13 +1,8 @@
 {
-  "query_params": {
-    "text": "Data Scientist",
-    "area": 2,
-    "professional_roles": [96, 10],
-    "per_page": 50
-  },
+  "base_query_string": "area=2&professional_role=96&only_with_salary=true&salary=120000",
 
   "num_workers": 3,
 
   "save_results_to_csv": false,
-  "sava_results_to_json": false
+  "save_results_to_json": false
 }

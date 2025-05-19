@@ -27,8 +27,8 @@ class Options:
 
     Options
     ----------
-    query_params : dict[str, Any]
-        Params for GET request to API
+    base_query_string : str
+        Common search params to retrieve vacancies
     num_workers : int
         Number of parallel workers for threading
     save_results_to_json : bool
@@ -37,7 +37,7 @@ class Options:
         Save vacancy list to CSV file
     """
 
-    query_params: dict[str, Any] | None = None
+    base_query_string: str = ""
     num_workers: int = 1
     save_results_to_json: bool = False
     save_results_to_csv: bool = False
@@ -101,8 +101,8 @@ def _parse_args(options: Options, argv: list[str]) -> None:
 
     args: Final = parser.parse_args(argv)
 
-    if args.text is not None and options.query_params is not None:
-        options.query_params["text"] = args.text
+    if args.text is not None:
+        pass  # don't used now
 
     if args.num_workers is not None:
         options.num_workers = args.num_workers

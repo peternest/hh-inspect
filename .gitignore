@@ -21,4 +21,5 @@ src/unused/*
 src/tests/*
 **/*.log
 
+HH_API.md
 TODO.md
