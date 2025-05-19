@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-class BasicVacancy:
+class Vacancy:
     """Only necessary fields from FullVacancy for further analysis.
 
     salary_from, salary_to = values are after taxes (0 means None)
@@ -33,6 +33,7 @@ class BasicVacancy:
     employment: str
     schedule: str
     key_skills: list[str]
+    premium: bool
     description: str
     vacancy_url: str
 
@@ -93,13 +94,14 @@ class FullVacancy:
     schedule: str
     description: str = field(repr=False)
     type: str
+    premium: bool
     published_at: str
     vacancy_url: str = field(repr=False)  # original 'alternate_url'
 
-    def to_basic_vacancy(self) -> BasicVacancy:
+    def to_basic_vacancy(self) -> Vacancy:
         salary_from, salary_to = _extract_and_calc_salary(self.salary_range)
 
-        return BasicVacancy(
+        return Vacancy(
             vacancy_id=self.vacancy_id,
             vacancy_name=self.vacancy_name,
             employer_name=(self.employer.name if self.employer is not None else ""),
@@ -110,6 +112,7 @@ class FullVacancy:
             employment=self.employment,
             schedule=self.schedule,
             key_skills=self.key_skills,
+            premium=self.premium,
             description=remove_html_tags(self.description),
             vacancy_url=self.vacancy_url,
         )
@@ -177,6 +180,7 @@ def parse_vacancy_data(vac_json: Any) -> FullVacancy:
         salary_range=parse_salary_range(vac_json.get("salary_range")),
         schedule=_get_subfield_value(vac_json, "schedule", "name"),
         type=_get_subfield_value(vac_json, "type", "name"),
+        premium=vac_json.get("premium", False),
         published_at=vac_json.get("published_at", ""),
         vacancy_url=vac_json.get("alternate_url", ""),
     )
@@ -191,12 +195,18 @@ def _extract_and_calc_salary(salary_range: SalaryRange | None) -> tuple[int, int
     rate: Final = EXCHANGE_RATES.get(currency, 1.0)
     gross_coef: Final = (1 - _TAX_RATE) if salary_dict.get("gross") else 1
 
-    salary_from = int(salary_dict.get("from_", 0) * rate * gross_coef)
-    salary_to = int(salary_dict.get("to", 0) * rate * gross_coef)
+    salary_from: int = 0
+    if salary_dict.get("from_") is not None:
+        salary_from = int(salary_dict.get("from_") * rate * gross_coef)
+
+    salary_to: int = 0
+    if salary_dict.get("to") is not None:
+        salary_to = int(salary_dict.get("to") * rate * gross_coef)
+
     return (salary_from, salary_to)
 
 
-def save_vacancies_to_json(vacancies: list[BasicVacancy], filename: str) -> None:
+def save_vacancies_to_json(vacancies: list[Vacancy], filename: str) -> None:
     with open(filename, "w", encoding="utf-8") as fp:
         for vacancy in vacancies:
             vac_str = json.dumps(asdict(vacancy), ensure_ascii=False, indent=2)

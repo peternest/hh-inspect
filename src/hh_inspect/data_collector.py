@@ -4,7 +4,7 @@ from typing import Final, LiteralString
 import requests
 
 from hh_inspect.options import Options
-from hh_inspect.vacancy import BasicVacancy, parse_vacancy_data
+from hh_inspect.vacancy import Vacancy, parse_vacancy_data
 
 
 REQUEST_TIMEOUT: Final = 5
@@ -29,7 +29,7 @@ class DataCollector:
         if options.num_workers is not None and options.num_workers > 1:
             self.num_workers = options.num_workers
 
-    def collect_vacancies(self) -> list[BasicVacancy]:
+    def collect_vacancies(self) -> list[Vacancy]:
         num_pages: Final = self._get_num_pages()
         if num_pages == 0:
             return []
@@ -70,8 +70,8 @@ class DataCollector:
             ids.extend(x["id"] for x in data["items"])
         return ids
 
-    def _build_vacancy_list(self, vacancy_ids: list[str], max_limit: int = 10) -> list[BasicVacancy]:
-        vacancy_list: list[BasicVacancy] = []
+    def _build_vacancy_list(self, vacancy_ids: list[str], max_limit: int = 10) -> list[Vacancy]:
+        vacancy_list: list[Vacancy] = []
         for vacancy_id in vacancy_ids[:max_limit]:
             vacancy = self.get_vacancy_or_404(vacancy_id)
             if vacancy is not None:
@@ -79,7 +79,7 @@ class DataCollector:
         return vacancy_list
 
     @staticmethod
-    def get_vacancy_or_404(vacancy_id: str) -> BasicVacancy | None:
+    def get_vacancy_or_404(vacancy_id: str) -> Vacancy | None:
         url: Final = f"{_API_BASE_URL}{vacancy_id}"
         response: Final = requests.get(url, timeout=REQUEST_TIMEOUT)
         vacancy_json: Final = response.json()

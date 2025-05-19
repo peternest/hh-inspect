@@ -3,7 +3,7 @@ from typing import Final
 
 import pytest
 
-from hh_inspect.vacancy import BasicVacancy, FullVacancy, parse_vacancy_data
+from hh_inspect.vacancy import FullVacancy, Vacancy, parse_vacancy_data
 
 
 @pytest.fixture
@@ -43,22 +43,24 @@ def test_parse_vacancy_data(example_vacancy: FullVacancy) -> None:
     assert len(vac.professional_roles) == 1
     assert vac.professional_roles[0].id == "96"
     assert vac.professional_roles[0].name == "Программист, разработчик"
+    assert vac.premium is True
     assert vac.published_at == "2025-05-15T15:15:15+0300"
     assert vac.vacancy_url == "https://hh.ru/vacancy/12345"
 
 
 def test_convert_to_basic_vacancy(example_vacancy: FullVacancy) -> None:
-    basic: BasicVacancy = example_vacancy.to_basic_vacancy()
+    vac: Vacancy = example_vacancy.to_basic_vacancy()
 
-    assert basic.vacancy_id == "12345"
-    assert basic.vacancy_name == "Инженер данных"
-    assert basic.employer_name == "Рога и копыта"
-    assert basic.region == "Санкт-Петербург"
-    assert basic.salary_from == 100000
-    assert basic.salary_to == 200000
-    assert basic.experience == "Нет опыта"
-    assert basic.employment == "Полная занятость"
-    assert basic.schedule == "Полный день"
-    assert basic.key_skills == ["SQL", "Python", "Machine Learning"]
-    assert basic.description.startswith("Приглашаем в команду")
-    assert basic.vacancy_url == "https://hh.ru/vacancy/12345"
+    assert vac.vacancy_id == "12345"
+    assert vac.vacancy_name == "Инженер данных"
+    assert vac.employer_name == "Рога и копыта"
+    assert vac.region == "Санкт-Петербург"
+    assert vac.salary_from == 100000
+    assert vac.salary_to == 200000
+    assert vac.experience == "Нет опыта"
+    assert vac.employment == "Полная занятость"
+    assert vac.schedule == "Полный день"
+    assert vac.key_skills == ["SQL", "Python", "Machine Learning"]
+    assert vac.premium is True
+    assert vac.description.startswith("Приглашаем в команду")
+    assert vac.vacancy_url == "https://hh.ru/vacancy/12345"

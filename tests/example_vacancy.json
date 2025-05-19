@@ -75,6 +75,7 @@
     "accredited_it_employer": false,
     "trusted": true
   },
+  "premium": true,
   "published_at": "2025-05-15T15:15:15+0300",
   "has_test": false,
   "languages": [],
