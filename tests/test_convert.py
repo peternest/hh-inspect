@@ -44,6 +44,7 @@ def test_parse_vacancy_data(example_vacancy: FullVacancy) -> None:
     assert vac.professional_roles[0].id == "96"
     assert vac.professional_roles[0].name == "Программист, разработчик"
     assert vac.published_at == "2025-05-15T15:15:15+0300"
+    assert vac.vacancy_url == "https://hh.ru/vacancy/12345"
 
 
 def test_convert_to_basic_vacancy(example_vacancy: FullVacancy) -> None:
@@ -60,3 +61,4 @@ def test_convert_to_basic_vacancy(example_vacancy: FullVacancy) -> None:
     assert basic.schedule == "Полный день"
     assert basic.key_skills == ["SQL", "Python", "Machine Learning"]
     assert basic.description.startswith("Приглашаем в команду")
+    assert basic.vacancy_url == "https://hh.ru/vacancy/12345"

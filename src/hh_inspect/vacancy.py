@@ -30,6 +30,7 @@ class BasicVacancy:
     schedule: str
     key_skills: list[str]
     description: str
+    vacancy_url: str
 
     def __repr__(self) -> str:
         return (
@@ -89,6 +90,7 @@ class FullVacancy:
     description: str = field(repr=False)
     type: str
     published_at: str
+    vacancy_url: str  # original 'alternate_url'
 
     def to_basic_vacancy(self) -> BasicVacancy:
         salary_from, salary_to = _extract_and_calc_salary(self.salary_range)
@@ -105,6 +107,7 @@ class FullVacancy:
             schedule=self.schedule,
             key_skills=self.key_skills,
             description=remove_html_tags(self.description),
+            vacancy_url=self.vacancy_url,
         )
 
 
@@ -171,6 +174,7 @@ def parse_vacancy_data(vacancy_json: Any) -> FullVacancy:
         schedule=_get_subfield_value(vacancy_json, "schedule", "name"),
         type=_get_subfield_value(vacancy_json, "type", "name"),
         published_at=vacancy_json.get("published_at", ""),
+        vacancy_url=vacancy_json.get("alternate_url", ""),
     )
 
 

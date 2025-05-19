@@ -24,6 +24,7 @@
     "id": "open",
     "name": "Открытая"
   },
+  "alternate_url": "https://hh.ru/vacancy/12345",
   "address": {
     "city": "Санкт-Петербург",
     "street": "улица Оптиков",
