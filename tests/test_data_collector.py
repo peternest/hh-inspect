@@ -11,7 +11,6 @@ def options() -> Options:
     return Options(
         query_params={"text": "TestQuery"},
         num_workers=3,
-        exchange_rates={"USD": 0.01234, "EUR": 0.01111, "RUR": 1.0000},
     )
 
 
@@ -19,7 +18,6 @@ def test_data_collector_constuctor(options: Options) -> None:
     dc: Final = DataCollector(options)
     assert dc.query_params.get("text") == "TestQuery"
     assert dc.num_workers == 3
-    assert dc.exchange_rates.get("RUR") == 1.0
 
 
 @pytest.mark.skip

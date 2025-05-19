@@ -1,0 +1,62 @@
+import json
+from typing import Final
+
+import pytest
+
+from hh_inspect.vacancy import BasicVacancy, FullVacancy, parse_vacancy_data
+
+
+@pytest.fixture
+def example_vacancy() -> FullVacancy:
+    with open("tests/example_vacancy.json", encoding="utf-8") as f:
+        vacancy_json: Final = json.load(f)
+    return parse_vacancy_data(vacancy_json)
+
+
+def test_parse_vacancy_data(example_vacancy: FullVacancy) -> None:
+    vac: FullVacancy = example_vacancy
+
+    assert vac.vacancy_id == "12345"
+    assert vac.vacancy_name == "Инженер данных"
+    assert vac.area.id == "2"
+    assert vac.area.name == "Санкт-Петербург"
+    assert vac.area.url == "https://api.hh.ru/areas/2"
+    assert vac.salary_range is not None
+    assert vac.salary_range.currency == "RUR"
+    assert vac.salary_range.frequency == "Раз в месяц"
+    assert vac.salary_range.from_ == 100000
+    assert vac.salary_range.to == 200000
+    assert vac.salary_range.gross is False
+    assert vac.salary_range.mode == "За месяц"
+    assert vac.type == "Открытая"
+    assert vac.description.startswith("<p><em><strong>Приглашаем в команду")
+    assert vac.employer is not None
+    assert vac.employer.id == "55555"
+    assert vac.employer.name == "Рога и копыта"
+    assert vac.employer.url == "https://api.hh.ru/employers/55555"
+    assert vac.employer.accredited_it_employer is False
+    assert vac.employer.trusted is True
+    assert vac.experience == "Нет опыта"
+    assert vac.employment == "Полная занятость"
+    assert vac.schedule == "Полный день"
+    assert vac.key_skills == ["SQL", "Python", "Machine Learning"]
+    assert len(vac.professional_roles) == 1
+    assert vac.professional_roles[0].id == "96"
+    assert vac.professional_roles[0].name == "Программист, разработчик"
+    assert vac.published_at == "2025-05-15T15:15:15+0300"
+
+
+def test_convert_to_basic_vacancy(example_vacancy: FullVacancy) -> None:
+    basic: BasicVacancy = example_vacancy.to_basic_vacancy()
+
+    assert basic.vacancy_id == "12345"
+    assert basic.vacancy_name == "Инженер данных"
+    assert basic.employer_name == "Рога и копыта"
+    assert basic.region == "Санкт-Петербург"
+    assert basic.salary_from == 100000
+    assert basic.salary_to == 200000
+    assert basic.experience == "Нет опыта"
+    assert basic.employment == "Полная занятость"
+    assert basic.schedule == "Полный день"
+    assert basic.key_skills == ["SQL", "Python", "Machine Learning"]
+    assert basic.description.startswith("Приглашаем в команду")

@@ -1,0 +1,106 @@
+{
+  "id": "12345",
+  "name": "Инженер данных",
+  "area": {
+    "id": "2",
+    "name": "Санкт-Петербург",
+    "url": "https://api.hh.ru/areas/2"
+  },
+  "salary_range": {
+    "currency": "RUR", 
+    "frequency": {
+      "id": "MONTHLY",
+      "name": "Раз в месяц"
+    },
+    "from": 100000, 
+    "to": 200000, 
+    "gross": false, 
+    "mode": {
+      "id": "MONTH",
+      "name": "За месяц"
+    }
+  },
+  "type": {
+    "id": "open",
+    "name": "Открытая"
+  },
+  "address": {
+    "city": "Санкт-Петербург",
+    "street": "улица Оптиков",
+    "building": "55",
+    "description": null,
+    "raw": "Санкт-Петербург, улица Оптиков, 55"
+  },
+  "allow_messages": true,
+  "experience": {
+    "id": "noExperience",
+    "name": "Нет опыта"
+  },
+  "schedule": {
+    "id": "fullDay",
+    "name": "Полный день"
+  },
+  "employment": {
+    "id": "full",
+    "name": "Полная занятость"
+  },
+  "department": null,
+  "show_contacts": true,
+  "contacts": null,
+  "description": "<p><em><strong>Приглашаем в команду инженера данных...</strong></em></p>",
+  "key_skills": [
+    {
+      "name": "SQL"
+    },
+    {
+      "name": "Python"
+    },
+    {
+      "name": "Machine Learning"
+    }
+  ],
+  "specializations": [],
+  "professional_roles": [
+    {
+      "id": "96",
+      "name": "Программист, разработчик"
+    }
+  ],
+  "employer": {
+    "id": "55555",
+    "name": "Рога и копыта",
+    "url": "https://api.hh.ru/employers/55555",
+    "vacancies_url": "https://api.hh.ru/vacancies?employer_id=55555",
+    "accredited_it_employer": false,
+    "trusted": true
+  },
+  "published_at": "2025-05-15T15:15:15+0300",
+  "has_test": false,
+  "languages": [],
+  "employment_form": {
+    "id": "FULL",
+    "name": "Полная"
+  },
+  "work_format": [
+    {
+      "id": "ON_SITE",
+      "name": "На месте работодателя"
+    },
+    {
+      "id": "HYBRID",
+      "name": "Гибрид"
+    }
+  ],
+  "work_schedule_by_days": [
+    {
+      "id": "FIVE_ON_TWO_OFF",
+      "name": "5/2"
+    }
+  ],
+  "working_hours": [
+    {
+      "id": "HOURS_8",
+      "name": "8 часов"
+    }
+  ]
+}

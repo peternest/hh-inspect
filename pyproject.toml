@@ -70,6 +70,7 @@ lines-after-imports = 2
 [tool.ruff.lint.per-file-ignores]
 "tests/*.py" = [
     "PLR2004",  # magic value used in comparison, consider replacing {} with constant variable
+    "RUF001",  # string contains ambiguous `{}`
     "S101",  # use of `assert` detected 
     "S311"  # standard pseudo-random generators are not suitable for cryptographic purposes
 ]
