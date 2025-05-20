@@ -54,6 +54,7 @@ def test_convert_to_basic_vacancy(example_vacancy: FullVacancy) -> None:
     assert vac.vacancy_id == "12345"
     assert vac.vacancy_name == "Инженер данных"
     assert vac.employer_name == "Рога и копыта"
+    assert vac.employer_city == "Санкт-Петербург"
     assert vac.accredited_it is False
     assert vac.region == "Санкт-Петербург"
     assert vac.salary_from == 100000

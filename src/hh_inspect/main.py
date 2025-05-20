@@ -1,5 +1,4 @@
 import logging
-import sys
 from typing import Final, LiteralString
 
 from hh_inspect.data_collector import DataCollector
@@ -37,7 +36,7 @@ class HHInspector:
 
 def main() -> None:
     logger.info("HH Inspector started")
-    options = prepare_options(sys.argv[1:])
+    options = prepare_options()
 
     hh = HHInspector(options)
     hh.run()

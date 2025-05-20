@@ -1,6 +1,7 @@
 import argparse
 import json
 import logging
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Final, LiteralString
@@ -27,7 +28,7 @@ class Options:
 
     Options
     ----------
-    base_query_string : str
+    *_query : str
         Common search params to retrieve vacancies
     num_workers : int
         Number of parallel workers for threading
@@ -37,7 +38,10 @@ class Options:
         Save vacancy list to CSV file
     """
 
-    base_query_string: str = ""
+    base_query: str = ""
+    text_query: str = ""
+    page_query: str = ""
+
     num_workers: int = 1
     save_results_to_json: bool = False
     save_results_to_csv: bool = False
@@ -47,12 +51,12 @@ class Options:
         return f"{self.__class__.__name__}({opts})"
 
 
-def prepare_options(argv: list[str]) -> Options:
+def prepare_options() -> Options:
     options = Options()
 
     # Parse config file first, so command line can override.
     _parse_config_file(options)
-    _parse_args(options, argv)
+    _parse_args(options, sys.argv[1:])
     return options
 
 

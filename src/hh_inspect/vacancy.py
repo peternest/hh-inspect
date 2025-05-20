@@ -26,6 +26,7 @@ class Vacancy:
     vacancy_id: str
     vacancy_name: str
     employer_name: str
+    employer_city: str
     accredited_it: bool
     region: str
     salary_from: int
@@ -40,7 +41,8 @@ class Vacancy:
     def __repr__(self) -> str:
         return (
             f"{self.__class__.__name__}("
-            f"{self.vacancy_id}, {self.vacancy_name}, {self.employer_name}, "
+            f"{self.vacancy_id}, {self.vacancy_name}, "
+            f"{self.employer_name}, {self.employer_city}, "
             f"({self.salary_from}, {self.salary_to})"
             f")"
         )
@@ -51,6 +53,15 @@ class Area:
     id: str
     name: str
     url: str
+
+
+@dataclass
+class Address:
+    city: str
+    street: str
+    building: str
+    description: str
+    raw: str
 
 
 @dataclass
@@ -86,6 +97,7 @@ class FullVacancy:
     vacancy_name: str  # original 'name'
     employer: Employer | None
     area: Area
+    address: Address | None
     employment: str
     experience: str
     key_skills: list[str]
@@ -105,6 +117,7 @@ class FullVacancy:
             vacancy_id=self.vacancy_id,
             vacancy_name=self.vacancy_name,
             employer_name=(self.employer.name if self.employer is not None else ""),
+            employer_city=(self.address.city if self.address is not None else ""),
             accredited_it=(self.employer.accredited_it_employer if self.employer is not None else False),
             region=self.area.name,
             salary_from=salary_from,
@@ -128,6 +141,17 @@ def parse_vacancy_data(vac_json: Any) -> FullVacancy:
         if isinstance(dict_or_none, dict):
             return str(dict_or_none.get(field2, ""))
         return ""
+
+    def parse_address(data: dict[str, Any] | None) -> Address | None:
+        if not data:
+            return None
+        return Address(
+            city=data.get("city", ""),
+            street=data.get("street", ""),
+            building=data.get("building", ""),
+            description=data.get("description", ""),
+            raw=data.get("raw", ""),
+        )
 
     def parse_employer(data: dict[str, Any] | None) -> Employer | None:
         if not data:
@@ -171,6 +195,7 @@ def parse_vacancy_data(vac_json: Any) -> FullVacancy:
             name=vac_json["area"]["name"],
             url=vac_json["area"]["url"],
         ),
+        address=parse_address(vac_json.get("address")),
         description=vac_json.get("description", ""),
         employer=parse_employer(vac_json.get("employer")),
         employment=_get_subfield_value(vac_json, "employment", "name"),

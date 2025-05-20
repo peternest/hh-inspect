@@ -23,7 +23,9 @@ TEXT: Final[LiteralString] = "text"
 
 class DataCollector:
     def __init__(self, options: Options) -> None:
-        self.base_query_string = options.base_query_string
+        self.base_query = options.base_query
+        self.text_query = options.text_query
+        self.page_query = options.page_query
 
         self.num_workers = 1
         if options.num_workers is not None and options.num_workers > 1:
@@ -36,9 +38,8 @@ class DataCollector:
         vacancy_ids: Final = self._build_vacancy_ids(num_pages)
         return self._build_vacancy_list(vacancy_ids)
 
-    def _build_url(self, per_page: int = 50) -> str:
-        additional_params: Final = f"&text=Python&per_page={per_page}"
-        final_url: Final = f"{_API_BASE_URL}?{self.base_query_string}{additional_params}"
+    def _build_url(self) -> str:
+        final_url: Final = f"{_API_BASE_URL}?{self.base_query}{self.text_query}{self.page_query}"
         logger.info(f"Requesting '{final_url}'")
         return final_url
 
@@ -70,9 +71,9 @@ class DataCollector:
             ids.extend(x["id"] for x in data["items"])
         return ids
 
-    def _build_vacancy_list(self, vacancy_ids: list[str], max_limit: int = 10) -> list[Vacancy]:
+    def _build_vacancy_list(self, vacancy_ids: list[str], max_limit: int = 0) -> list[Vacancy]:
         vacancy_list: list[Vacancy] = []
-        for vacancy_id in vacancy_ids[:max_limit]:
+        for vacancy_id in vacancy_ids:
             vacancy = self.get_vacancy_or_404(vacancy_id)
             if vacancy is not None:
                 vacancy_list.append(vacancy)
@@ -81,7 +82,11 @@ class DataCollector:
     @staticmethod
     def get_vacancy_or_404(vacancy_id: str) -> Vacancy | None:
         url: Final = f"{_API_BASE_URL}{vacancy_id}"
-        response: Final = requests.get(url, timeout=REQUEST_TIMEOUT)
+        try:
+            response: Final = requests.get(url, timeout=REQUEST_TIMEOUT)
+        except requests.exceptions.ConnectTimeout:
+            logger.exception("Timeout")
+
         vacancy_json: Final = response.json()
         # print(response.status_code, json.dumps(vacancy_json, ensure_ascii=False, indent=2))  # noqa: ERA001
 
