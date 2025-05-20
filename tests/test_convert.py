@@ -54,6 +54,7 @@ def test_convert_to_basic_vacancy(example_vacancy: FullVacancy) -> None:
     assert vac.vacancy_id == "12345"
     assert vac.vacancy_name == "Инженер данных"
     assert vac.employer_name == "Рога и копыта"
+    assert vac.accredited_it is False
     assert vac.region == "Санкт-Петербург"
     assert vac.salary_from == 100000
     assert vac.salary_to == 200000
@@ -61,6 +62,5 @@ def test_convert_to_basic_vacancy(example_vacancy: FullVacancy) -> None:
     assert vac.employment == "Полная занятость"
     assert vac.schedule == "Полный день"
     assert vac.key_skills == ["SQL", "Python", "Machine Learning"]
-    assert vac.premium is True
     assert vac.description.startswith("Приглашаем в команду")
     assert vac.vacancy_url == "https://hh.ru/vacancy/12345"

@@ -26,6 +26,7 @@ class Vacancy:
     vacancy_id: str
     vacancy_name: str
     employer_name: str
+    accredited_it: bool
     region: str
     salary_from: int
     salary_to: int
@@ -33,7 +34,6 @@ class Vacancy:
     employment: str
     schedule: str
     key_skills: list[str]
-    premium: bool
     description: str
     vacancy_url: str
 
@@ -105,6 +105,7 @@ class FullVacancy:
             vacancy_id=self.vacancy_id,
             vacancy_name=self.vacancy_name,
             employer_name=(self.employer.name if self.employer is not None else ""),
+            accredited_it=(self.employer.accredited_it_employer if self.employer is not None else False),
             region=self.area.name,
             salary_from=salary_from,
             salary_to=salary_to,
@@ -112,7 +113,6 @@ class FullVacancy:
             employment=self.employment,
             schedule=self.schedule,
             key_skills=self.key_skills,
-            premium=self.premium,
             description=remove_html_tags(self.description),
             vacancy_url=self.vacancy_url,
         )
