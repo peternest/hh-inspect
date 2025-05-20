@@ -43,8 +43,10 @@ goto end
 echo Updating dependencies...
 uv sync -q
 .venv\Scripts\python --version
-.venv\Scripts\pytest --version
+uv --version
 .venv\Scripts\ruff --version
+.venv\Scripts\mypy --version
+.venv\Scripts\pytest --version
 goto end
 
 :clean
