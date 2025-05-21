@@ -5,6 +5,6 @@
 
   "num_workers": 3,
 
-  "save_results_to_csv": false,
+  "save_results_to_csv": true,
   "save_results_to_json": true
 }

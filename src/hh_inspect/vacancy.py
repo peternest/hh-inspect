@@ -131,7 +131,7 @@ class FullVacancy:
         )
 
 
-def parse_vacancy_data(vac_json: Any) -> FullVacancy:
+def parse_vacancy_data(vac_json: Any) -> FullVacancy:  # noqa: C901
     def _get_subfield_value(vac_json: Any, field1: str, field2: str) -> str:
         """Return value of a dict subobject or "" if missing.
 
@@ -232,7 +232,7 @@ def _extract_and_calc_salary(salary_range: SalaryRange | None) -> tuple[int, int
 
 
 def save_vacancies_to_json(vacancies: list[Vacancy], filename: str) -> None:
+    logger.info(f"Saving vacancies to '{filename}'...")
     with open(filename, "w", encoding="utf-8") as fp:
-        for vacancy in vacancies:
-            vac_str = json.dumps(asdict(vacancy), ensure_ascii=False, indent=2)
-            fp.write(f"{vac_str}\n")
+        json_str = json.dumps([vac.__dict__ for vac in vacancies], ensure_ascii=False, indent=2)
+        fp.write(f"{json_str}\n")

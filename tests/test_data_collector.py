@@ -9,13 +9,20 @@ from hh_inspect.options import Options
 @pytest.fixture
 def options() -> Options:
     return Options(
-        base_query_string="QueryString", num_workers=3, save_results_to_json=False, save_results_to_csv=False
+        base_query="BaseQuery",
+        text_query="TextQuery",
+        page_query="PageQuery",
+        num_workers=3,
+        save_results_to_json=False,
+        save_results_to_csv=False,
     )
 
 
 def test_data_collector_constuctor(options: Options) -> None:
     dc: Final = DataCollector(options)
-    assert dc.base_query_string == "QueryString"
+    assert dc.base_query == "BaseQuery"
+    assert dc.text_query == "TextQuery"
+    assert dc.page_query == "PageQuery"
     assert dc.num_workers == 3
 
 

@@ -71,7 +71,7 @@ class DataCollector:
             ids.extend(x["id"] for x in data["items"])
         return ids
 
-    def _build_vacancy_list(self, vacancy_ids: list[str], max_limit: int = 0) -> list[Vacancy]:
+    def _build_vacancy_list(self, vacancy_ids: list[str]) -> list[Vacancy]:
         vacancy_list: list[Vacancy] = []
         for vacancy_id in vacancy_ids:
             vacancy = self.get_vacancy_or_404(vacancy_id)
