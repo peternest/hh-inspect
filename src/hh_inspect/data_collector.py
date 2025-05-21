@@ -1,7 +1,9 @@
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from typing import Final, LiteralString
 
 import requests
+from tqdm import tqdm
 
 from hh_inspect.options import Options
 from hh_inspect.vacancy import Vacancy, parse_vacancy_data
@@ -13,12 +15,6 @@ RESPONSE_OK: Final = 200
 _API_BASE_URL: Final[LiteralString] = "https://api.hh.ru/vacancies/"
 
 logger = logging.getLogger(__name__)
-
-
-# Query params in Enum or class (per_page, text)!
-
-PER_PAGE: Final[LiteralString] = "per_page"
-TEXT: Final[LiteralString] = "text"
 
 
 class DataCollector:
@@ -73,14 +69,20 @@ class DataCollector:
 
     def _build_vacancy_list(self, vacancy_ids: list[str]) -> list[Vacancy]:
         vacancy_list: list[Vacancy] = []
-        for vacancy_id in vacancy_ids:
-            vacancy = self.get_vacancy_or_404(vacancy_id)
-            if vacancy is not None:
-                vacancy_list.append(vacancy)
+        with ThreadPoolExecutor(max_workers=self.num_workers) as executor:
+            for vacancy in tqdm(
+                executor.map(self.get_vacancy_or_none, vacancy_ids),
+                desc="Getting data from api.hh.ru",
+                ncols=100,
+                total=len(vacancy_ids),
+            ):
+                if vacancy is not None:
+                    vacancy_list.append(vacancy)  # noqa: PERF401
+
         return vacancy_list
 
     @staticmethod
-    def get_vacancy_or_404(vacancy_id: str) -> Vacancy | None:
+    def get_vacancy_or_none(vacancy_id: str) -> Vacancy | None:
         url: Final = f"{_API_BASE_URL}{vacancy_id}"
         try:
             response: Final = requests.get(url, timeout=REQUEST_TIMEOUT)
@@ -92,9 +94,7 @@ class DataCollector:
 
         if response.status_code == RESPONSE_OK:
             full_vac = parse_vacancy_data(vacancy_json)
-            vacancy = full_vac.to_basic_vacancy()
-            print(f"{vacancy}")
-            return vacancy
+            return full_vac.to_basic_vacancy()
         return None
 
 
