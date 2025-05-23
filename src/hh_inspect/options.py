@@ -39,6 +39,7 @@ class Options:
     """
 
     base_query: str = ""
+    expr_query: str = ""
     text_query: str = ""
     page_query: str = ""
 
