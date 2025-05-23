@@ -34,6 +34,7 @@ dev = [
     "ruff>=0.11.10",
     "types-requests>=2.32.0.20250515",
     "types-seaborn>=0.13.2.20250516",
+    "types-tqdm>=4.67.0.20250516",
 ]
 
 [tool.ruff]
