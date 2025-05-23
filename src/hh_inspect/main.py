@@ -7,7 +7,7 @@ from hh_inspect.options import Options, prepare_options
 from hh_inspect.vacancy import save_vacancies_to_json
 
 
-_LOG_FILENAME: Final[LiteralString] = "../data/output.log"
+_LOG_FILENAME: Final[LiteralString] = "../data/hh_inspect.log"
 _JSON_FILENAME: Final[LiteralString] = "../data/vacancies.json"
 _CSV_FILENAME: Final[LiteralString] = "../data/vacancies.csv"
 
@@ -24,10 +24,13 @@ logger = logging.getLogger(__name__)
 class HHInspector:
     """Main controller class to retrieve vacancies from HH and analyze them."""
 
+    options: Options
+    collector: DataCollector
+    analyzer: Analyzer
+
     def __init__(self, options: Options) -> None:
         self.options = options
-        self.collector: Final = DataCollector(options)
-        self.analyzer = None
+        self.collector = DataCollector(options)
 
     def run(self) -> None:
         logger.info("Creating the list of vacancies...")
@@ -39,6 +42,8 @@ class HHInspector:
         self.analyzer = Analyzer(vacancies)
         if self.options.save_results_to_csv:
             self.analyzer.save_vacancies_to_csv(_CSV_FILENAME)
+
+        self.analyzer.analyze()
 
 
 def main() -> None:

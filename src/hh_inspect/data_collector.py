@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 class DataCollector:
     def __init__(self, options: Options) -> None:
         self.base_query = options.base_query
+        self.expr_query = options.expr_query
         self.text_query = options.text_query
         self.page_query = options.page_query
 
@@ -35,7 +36,7 @@ class DataCollector:
         return self._build_vacancy_list(vacancy_ids)
 
     def _build_url(self) -> str:
-        final_url: Final = f"{_API_BASE_URL}?{self.base_query}{self.text_query}{self.page_query}"
+        final_url: Final = f"{_API_BASE_URL}?{self.base_query}{self.expr_query}{self.text_query}{self.page_query}"
         logger.info(f"Requesting '{final_url}'")
         return final_url
 
@@ -100,5 +101,5 @@ class DataCollector:
 
 if __name__ == "__main__":
     start = 120596730
-    for n in range(10):
-        DataCollector.get_vacancy_or_404(str(start + n))
+    for n in range(3):
+        DataCollector.get_vacancy_or_none(str(start + n))

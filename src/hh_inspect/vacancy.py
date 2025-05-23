@@ -7,10 +7,12 @@ from hh_inspect.options import EXCHANGE_RATES
 from hh_inspect.utils import remove_html_tags
 
 
-_TAX_RATE: Final = 0.13
-
 logger = logging.getLogger(__name__)
 
+_TAX_RATE: Final = 0.13
+
+_FIX_SALARY_TO: Final = True
+_FIX_SALARY_TO_COEF: Final = 1.1
 
 # Some optional fields in models are marked according to specification at
 # https://api.hh.ru/openapi/redoc#tag/Vakansii/operation/get-vacancy
@@ -21,14 +23,16 @@ class Vacancy:
     """Only necessary fields from FullVacancy for further analysis.
 
     salary_from, salary_to = values are after taxes (0 means None)
+
+    salary_to = salary_from * _FIX_SALARY_TO_COEF if absent!
     """
 
     vacancy_id: str
-    vacancy_name: str
+    region: str
     employer_name: str
     employer_city: str
     accredited_it: bool
-    region: str
+    vacancy_name: str
     salary_from: int
     salary_to: int
     experience: str
@@ -227,6 +231,9 @@ def _extract_and_calc_salary(salary_range: SalaryRange | None) -> tuple[int, int
     salary_to: int = 0
     if salary_dict.get("to") is not None:
         salary_to = int(salary_dict.get("to") * rate * gross_coef)
+
+    if salary_to == 0 and _FIX_SALARY_TO:
+        salary_to = int(salary_from * _FIX_SALARY_TO_COEF)
 
     return (salary_from, salary_to)
 
