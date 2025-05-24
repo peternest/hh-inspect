@@ -3,7 +3,7 @@ from typing import Final, LiteralString
 
 from hh_inspect.analyzer import Analyzer
 from hh_inspect.data_collector import DataCollector
-from hh_inspect.options import Options, prepare_options
+from hh_inspect.settings import Settings, load_settings
 from hh_inspect.vacancy import save_vacancies_to_json
 
 
@@ -24,23 +24,26 @@ logger = logging.getLogger(__name__)
 class HHInspector:
     """Main controller class to retrieve vacancies from HH and analyze them."""
 
-    options: Options
+    settings: Settings
     collector: DataCollector
     analyzer: Analyzer
 
-    def __init__(self, options: Options) -> None:
-        self.options = options
-        self.collector = DataCollector(options)
+    def __init__(self, settings: Settings) -> None:
+        self.settings = settings
+        self.collector = DataCollector(settings)
 
     def run(self) -> None:
         logger.info("Creating the list of vacancies...")
         vacancies: Final = self.collector.collect_vacancies()
 
-        if self.options.save_results_to_json:
+        if len(vacancies) == 0:
+            return
+
+        if self.settings.general.save_results_to_json:
             save_vacancies_to_json(vacancies, _JSON_FILENAME)
 
         self.analyzer = Analyzer(vacancies)
-        if self.options.save_results_to_csv:
+        if self.settings.general.save_results_to_csv:
             self.analyzer.save_vacancies_to_csv(_CSV_FILENAME)
 
         self.analyzer.analyze()
@@ -48,7 +51,7 @@ class HHInspector:
 
 def main() -> None:
     logger.info("HH Inspector started")
-    options = prepare_options()
+    settings = load_settings()
 
-    hh = HHInspector(options)
+    hh = HHInspector(settings)
     hh.run()

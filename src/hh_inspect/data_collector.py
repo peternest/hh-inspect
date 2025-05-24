@@ -5,28 +5,26 @@ from typing import Final, LiteralString
 import requests
 from tqdm import tqdm
 
-from hh_inspect.options import Options
+from hh_inspect.settings import Settings
 from hh_inspect.vacancy import Vacancy, parse_vacancy_data
 
 
 REQUEST_TIMEOUT: Final = 5
 RESPONSE_OK: Final = 200
 
-_API_BASE_URL: Final[LiteralString] = "https://api.hh.ru/vacancies/"
+_API_URL: Final[LiteralString] = "https://api.hh.ru/vacancies/"
 
 logger = logging.getLogger(__name__)
 
 
 class DataCollector:
-    def __init__(self, options: Options) -> None:
-        self.base_query = options.base_query
-        self.expr_query = options.expr_query
-        self.text_query = options.text_query
-        self.page_query = options.page_query
+    def __init__(self, settings: Settings) -> None:
+        self.settings = settings
+        self._query_params = self.settings.convert_query_to_dict()
+        self._query_params["page"] = 0  # to be used later
 
-        self.num_workers = 1
-        if options.num_workers is not None and options.num_workers > 1:
-            self.num_workers = options.num_workers
+    def _get_num_workers(self) -> int:
+        return max(self.settings.general.num_workers, 1)
 
     def collect_vacancies(self) -> list[Vacancy]:
         num_pages: Final = self._get_num_pages()
@@ -35,17 +33,15 @@ class DataCollector:
         vacancy_ids: Final = self._build_vacancy_ids(num_pages)
         return self._build_vacancy_list(vacancy_ids)
 
-    def _build_url(self) -> str:
-        final_url: Final = f"{_API_BASE_URL}?{self.base_query}{self.expr_query}{self.text_query}{self.page_query}"
-        logger.info(f"Requesting '{final_url}'")
-        return final_url
-
     def _get_num_pages(self) -> int:
-        url: Final = self._build_url()
+        url: Final = f"{_API_URL}"
+        response = requests.get(url, params=self._query_params, timeout=REQUEST_TIMEOUT)
+        logger.info(f"Requested '{response.url}'")
 
-        response = requests.get(url, timeout=REQUEST_TIMEOUT)
         if response.status_code != RESPONSE_OK:
             logger.error(f"Code: {response.status_code}")
+            logger.error(response.json())
+            logger.error(f"Headers: {response.headers}")
             return 0
 
         found: Final[int] = response.json().get("found", 0)
@@ -55,11 +51,12 @@ class DataCollector:
         return num_pages
 
     def _build_vacancy_ids(self, num_pages: int) -> list[str]:
-        url: Final = self._build_url()
-
+        url: Final = f"{_API_URL}"
         ids: list[str] = []
         for idx in range(num_pages + 1):
-            response = requests.get(url, {"page": idx}, timeout=REQUEST_TIMEOUT)
+            self._query_params["page"] = idx
+            response = requests.get(url, params=self._query_params, timeout=REQUEST_TIMEOUT)
+            logger.info(f"Requested '{response.url}'")
             data = response.json()
             if response.status_code != RESPONSE_OK:
                 logger.error(f"Code: {response.status_code}")
@@ -70,7 +67,7 @@ class DataCollector:
 
     def _build_vacancy_list(self, vacancy_ids: list[str]) -> list[Vacancy]:
         vacancy_list: list[Vacancy] = []
-        with ThreadPoolExecutor(max_workers=self.num_workers) as executor:
+        with ThreadPoolExecutor(max_workers=self._get_num_workers()) as executor:
             for vacancy in tqdm(
                 executor.map(self.get_vacancy_or_none, vacancy_ids),
                 desc="Getting data from api.hh.ru",
@@ -82,11 +79,11 @@ class DataCollector:
 
         return vacancy_list
 
-    @staticmethod
-    def get_vacancy_or_none(vacancy_id: str) -> Vacancy | None:
-        url: Final = f"{_API_BASE_URL}{vacancy_id}"
+    def get_vacancy_or_none(self, vacancy_id: str) -> Vacancy | None:
+        url: Final = f"{_API_URL}{vacancy_id}"
         try:
             response: Final = requests.get(url, timeout=REQUEST_TIMEOUT)
+            logger.info(f"Requested '{response.url}'")
         except requests.exceptions.ConnectTimeout:
             logger.exception("Timeout")
 
@@ -97,9 +94,3 @@ class DataCollector:
             full_vac = parse_vacancy_data(vacancy_json)
             return full_vac.to_basic_vacancy()
         return None
-
-
-if __name__ == "__main__":
-    start = 120596730
-    for n in range(3):
-        DataCollector.get_vacancy_or_none(str(start + n))

@@ -3,7 +3,7 @@ import logging
 from dataclasses import asdict, dataclass, field
 from typing import Any, Final
 
-from hh_inspect.options import EXCHANGE_RATES
+from hh_inspect.settings import EXCHANGE_RATES
 from hh_inspect.utils import remove_html_tags
 
 
