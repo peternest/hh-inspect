@@ -34,6 +34,7 @@ class DataCollector:
         url: Final = f"{_API_URL}"
         response = requests.get(url, params=self.query_params, timeout=REQUEST_TIMEOUT)
         logger.info(f"Requested '{response.url}'")
+        print(f"Requested '{response.url}'")
 
         if response.status_code != RESPONSE_OK:
             logger.error(f"Code: {response.status_code}")
@@ -72,7 +73,7 @@ class DataCollector:
                 total=len(vacancy_ids),
             ):
                 if vacancy is not None:
-                    vacancy_list.append(vacancy)  # noqa: PERF401
+                    vacancy_list.append(vacancy)
 
         return vacancy_list
 
@@ -80,7 +81,6 @@ class DataCollector:
         url: Final = f"{_API_URL}{vacancy_id}"
         try:
             response: Final = requests.get(url, timeout=REQUEST_TIMEOUT)
-            logger.info(f"Requested '{response.url}'")
         except requests.exceptions.ConnectTimeout:
             logger.exception("Timeout")
 

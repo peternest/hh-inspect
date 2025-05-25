@@ -29,10 +29,10 @@ class QuerySettings(BaseModel):
     text: str = "Python"
     excluded_text: str = ""
     search_field: str = "name"
-    area: list[str] = ["1"]
+    area: list[str] = ["2"]
     professional_role: list[str] = ["96"]
     salary: int = 100000
-    only_with_salary: bool = False
+    only_with_salary: bool = True
     experience: list[str] | None = None
     per_page: int = 20
     order_by: str = "publication_time"
@@ -67,7 +67,7 @@ class Settings(BaseSettings):
         try:
             settings = cls.model_validate(data)
         except ValidationError:
-            logger.exception("Error validating config:")
+            logger.exception("Error while validating config, using default settings.")
             return cls()
         return settings
 
@@ -81,6 +81,5 @@ class Settings(BaseSettings):
 def load_settings() -> Settings:
     # Parse config file first, so command line can override.
     settings = Settings().load_from_config()
-    # print(settings.model_dump())
     # _parse_args(options, sys.argv[1:])
     return settings

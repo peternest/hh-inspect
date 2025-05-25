@@ -45,9 +45,9 @@ class Vacancy:
     def __repr__(self) -> str:
         return (
             f"{self.__class__.__name__}("
-            f"{self.vacancy_id}, {self.vacancy_name}, "
-            f"{self.employer_name}, {self.employer_city}, "
-            f"({self.salary_from}, {self.salary_to})"
+            f"{self.vacancy_id}, "
+            f"{self.employer_name[:35]:35}, {self.employer_city[:15]:15}, {self.vacancy_name[:35]:35}, "
+            f"({self.salary_from:6}, {self.salary_to:6})"
             f")"
         )
 
@@ -117,11 +117,21 @@ class FullVacancy:
     def to_basic_vacancy(self) -> Vacancy:
         salary_from, salary_to = _extract_and_calc_salary(self.salary_range)
 
+        def get_employer_name() -> str:
+            if self.employer is not None and self.employer.name is not None:
+                return self.employer.name
+            return ""
+
+        def get_employer_city() -> str:
+            if self.address is not None and self.address.city is not None:
+                return self.address.city
+            return ""
+
         return Vacancy(
             vacancy_id=self.vacancy_id,
             vacancy_name=self.vacancy_name,
-            employer_name=(self.employer.name if self.employer is not None else ""),
-            employer_city=(self.address.city if self.address is not None else ""),
+            employer_name=get_employer_name(),
+            employer_city=get_employer_city(),
             accredited_it=(self.employer.accredited_it_employer if self.employer is not None else False),
             region=self.area.name,
             salary_from=salary_from,
