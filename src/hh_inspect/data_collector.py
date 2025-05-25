@@ -66,15 +66,18 @@ class DataCollector:
     def _build_vacancy_list(self, vacancy_ids: list[str]) -> list[Vacancy]:
         vacancy_list: list[Vacancy] = []
         with ThreadPoolExecutor(max_workers=self.num_workers) as executor:
-            for vacancy in tqdm(
-                executor.map(self.get_vacancy_or_none, vacancy_ids),
-                desc="Getting data from api.hh.ru",
-                ncols=100,
-                total=len(vacancy_ids),
-            ):
-                if vacancy is not None:
-                    vacancy_list.append(vacancy)
-
+            vacancy_list.extend(
+                [
+                    vacancy
+                    for vacancy in tqdm(
+                        executor.map(self.get_vacancy_or_none, vacancy_ids),
+                        desc="Getting data from api.hh.ru",
+                        ncols=100,
+                        total=len(vacancy_ids),
+                    )
+                    if vacancy is not None
+                ]
+            )
         return vacancy_list
 
     def get_vacancy_or_none(self, vacancy_id: str) -> Vacancy | None:
