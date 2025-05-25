@@ -19,12 +19,9 @@ logger = logging.getLogger(__name__)
 
 class DataCollector:
     def __init__(self, settings: Settings) -> None:
-        self.settings = settings
-        self._query_params = self.settings.convert_query_to_dict()
-        self._query_params["page"] = 0  # to be used later
-
-    def _get_num_workers(self) -> int:
-        return max(self.settings.general.num_workers, 1)
+        self.query_params = settings.convert_query_to_dict()
+        self.query_params["page"] = 0  # to be used later
+        self.num_workers = max(settings.general.num_workers, 1)
 
     def collect_vacancies(self) -> list[Vacancy]:
         num_pages: Final = self._get_num_pages()
@@ -35,7 +32,7 @@ class DataCollector:
 
     def _get_num_pages(self) -> int:
         url: Final = f"{_API_URL}"
-        response = requests.get(url, params=self._query_params, timeout=REQUEST_TIMEOUT)
+        response = requests.get(url, params=self.query_params, timeout=REQUEST_TIMEOUT)
         logger.info(f"Requested '{response.url}'")
 
         if response.status_code != RESPONSE_OK:
@@ -54,8 +51,8 @@ class DataCollector:
         url: Final = f"{_API_URL}"
         ids: list[str] = []
         for idx in range(num_pages + 1):
-            self._query_params["page"] = idx
-            response = requests.get(url, params=self._query_params, timeout=REQUEST_TIMEOUT)
+            self.query_params["page"] = idx
+            response = requests.get(url, params=self.query_params, timeout=REQUEST_TIMEOUT)
             logger.info(f"Requested '{response.url}'")
             data = response.json()
             if response.status_code != RESPONSE_OK:
@@ -67,7 +64,7 @@ class DataCollector:
 
     def _build_vacancy_list(self, vacancy_ids: list[str]) -> list[Vacancy]:
         vacancy_list: list[Vacancy] = []
-        with ThreadPoolExecutor(max_workers=self._get_num_workers()) as executor:
+        with ThreadPoolExecutor(max_workers=self.num_workers) as executor:
             for vacancy in tqdm(
                 executor.map(self.get_vacancy_or_none, vacancy_ids),
                 desc="Getting data from api.hh.ru",

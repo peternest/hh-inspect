@@ -30,24 +30,24 @@ def settings() -> Settings:
     )
 
 
-def test_data_collector_constuctor(settings: Settings) -> None:
+def test_data_collector_constructor(settings: Settings) -> None:
     dc: Final = DataCollector(settings)
-    # QuerySettings checks
-    assert dc.settings.query.text == "QueryText"
-    assert dc.settings.query.excluded_text == "no_senior"
-    assert dc.settings.query.search_field == "name"
-    assert dc.settings.query.area == ["1", "2"]
-    assert dc.settings.query.professional_role == ["96", "165"]
-    assert dc.settings.query.salary == 100000
-    assert dc.settings.query.only_with_salary is True
-    assert dc.settings.query.experience == ["between1And3", "between3And6"]
-    assert dc.settings.query.per_page == 50
-    assert dc.settings.query.order_by == "publication_time"
-    assert dc.settings.query.label == "not_from_agency"
-    # GeneralSettings checks
-    assert dc.settings.general.num_workers == 3
-    assert dc.settings.general.save_results_to_json is False
-    assert dc.settings.general.save_results_to_csv is False
+
+    assert dc.query_params == {
+        "page": 0,
+        "text": "QueryText",
+        "excluded_text": "no_senior",
+        "search_field": "name",
+        "area": ["1", "2"],
+        "professional_role": ["96", "165"],
+        "salary": 100000,
+        "only_with_salary": True,
+        "experience": ["between1And3", "between3And6"],
+        "per_page": 50,
+        "order_by": "publication_time",
+        "label": "not_from_agency",
+    }
+    assert dc.num_workers == 3
 
 
 @pytest.mark.skip
