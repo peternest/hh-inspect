@@ -1,3 +1,6 @@
+import pytest
+from pydantic import ValidationError
+
 from hh_inspect.settings import GeneralSettings, QuerySettings, Settings
 
 
@@ -9,6 +12,38 @@ def test_default_settings() -> None:
     assert st.query.experience is None
     assert st.query.label is None
     assert st.general.num_workers == 1
+    assert st.general.save_results_to_csv is False
+    assert st.general.save_results_to_json is False
+
+
+def test_partial_query_settings() -> None:
+    st = Settings(query=QuerySettings(text="Go"))
+    assert st.query.text == "Go"
+    assert st.general.num_workers == 1  # default
+
+
+def test_partial_general_settings() -> None:
+    st = Settings(general=GeneralSettings(num_workers=5))
+    assert st.query.text == "Python"  # default
+    assert st.general.num_workers == 5
+
+
+def test_invalid_salary_type() -> None:
+    with pytest.raises(ValidationError):
+        QuerySettings(salary="not_a_number")  # salary must be int
+
+
+def test_list_fields() -> None:
+    st = QuerySettings(area=["1", "2", "3"], professional_role=["96", "165"])
+    assert st.area == ["1", "2", "3"]
+    assert st.professional_role == ["96", "165"]
+
+
+def test_to_dict_method() -> None:
+    st = QuerySettings(text="Test", area=["1"])
+    d = st.to_dict()
+    assert d["text"] == "Test"
+    assert d["area"] == ["1"]
 
 
 def test_regular_settings() -> None:

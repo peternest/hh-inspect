@@ -60,17 +60,17 @@ class Settings(BaseSettings):
         return self.query.to_dict()
 
     def __str__(self) -> str:
-        return self.model_dump()
+        return str(self.model_dump())
 
 
 class DefaultSettings(Settings):
-    """Return default setting, completely ignoring CLI/ENV."""
+    """Return default setting, completely ignoring CLI."""
 
-    model_config = SettingsConfigDict(cli_parse_args=False, env_parse=False)
+    model_config = SettingsConfigDict(cli_parse_args=False)
 
 
 class FileOnlySettings(Settings):
-    model_config = SettingsConfigDict(cli_parse_args=False, env_parse=False)
+    model_config = SettingsConfigDict(cli_parse_args=False)
 
     @classmethod
     def load_from_config(cls, config_file: str = _DEFAULT_CONFIG) -> "Settings":
