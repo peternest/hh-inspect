@@ -1,10 +1,12 @@
+import argparse
 import logging
+import sys
 from pathlib import Path
 from typing import Final, LiteralString
 
 import yaml
 from pydantic import BaseModel, ValidationError
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 type QueryValue = str | int | bool
@@ -51,35 +53,71 @@ class GeneralSettings(BaseModel):
 class Settings(BaseSettings):
     # https://docs.pydantic.dev/latest/concepts/pydantic_settings/#the-basics
 
-    # model_config = SettingsConfigDict(cli_parse_args=True)
-
     query: QuerySettings = QuerySettings()
     general: GeneralSettings = GeneralSettings()
-
-    @classmethod
-    def load_from_config(cls, config_file: str = _DEFAULT_CONFIG) -> "Settings":
-        if config_file and not Path(config_file).exists():
-            logger.error(f"Cannot find config file: '{config_file}'")
-            return cls()
-
-        with Path(config_file).open("r", encoding="utf-8") as f:
-            data = yaml.safe_load(f)
-        try:
-            settings = cls.model_validate(data)
-        except ValidationError:
-            logger.exception("Error while validating config, using default settings.")
-            return cls()
-        return settings
 
     def convert_query_to_dict(self) -> QueryDict:
         return self.query.to_dict()
 
     def __str__(self) -> str:
-        return yaml.safe_dump(self.model_dump(), allow_unicode=True, sort_keys=False)
+        return self.model_dump()
+
+
+class DefaultSettings(Settings):
+    """Return default setting, completely ignoring CLI/ENV."""
+
+    model_config = SettingsConfigDict(cli_parse_args=False, env_parse=False)
+
+
+class FileOnlySettings(Settings):
+    model_config = SettingsConfigDict(cli_parse_args=False, env_parse=False)
+
+    @classmethod
+    def load_from_config(cls, config_file: str = _DEFAULT_CONFIG) -> "Settings":
+        if config_file and not Path(config_file).exists():
+            logger.error(f"Cannot find config file: '{config_file}'")
+            return DefaultSettings()
+
+        with Path(config_file).open("r", encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+        return cls.model_validate(data)
 
 
 def load_settings() -> Settings:
-    # Parse config file first, so command line can override.
-    settings = Settings().load_from_config()
-    # _parse_args(options, sys.argv[1:])
-    return settings
+    try:
+        settings = FileOnlySettings.load_from_config()
+    except ValidationError:
+        logger.exception("Failed to load settings. Using default values.")
+        print("Failed to load settings. Using default values.")
+        return DefaultSettings()
+    else:
+        _parse_args(settings, sys.argv[1:])
+        return settings
+
+
+def _parse_args(settings: Settings, argv: list[str]) -> None:
+    parser = argparse.ArgumentParser(description="HeadHunter vacancies inspector")
+    parser.add_argument(
+        "-t",
+        "--text",
+        action="store",
+        type=str,
+        default=None,
+        help="Text to search (e.g. 'Python developer')",
+    )
+    parser.add_argument(
+        "-n",
+        "--num_workers",
+        action="store",
+        type=int,
+        default=None,
+        help="Number of parallel workers for multithreading.",
+    )
+
+    args: Final = parser.parse_args(argv)
+
+    if args.text is not None:
+        settings.query.text = args.text
+
+    if args.num_workers is not None and isinstance(args.num_workers, int) and args.num_workers >= 1:
+        settings.general.num_workers = args.num_workers
