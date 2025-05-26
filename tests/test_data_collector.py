@@ -3,7 +3,7 @@ from typing import Final
 import pytest
 
 from hh_inspect.data_collector import DataCollector
-from hh_inspect.settings import GeneralSettings, QuerySettings, Settings
+from hh_inspect.settings import FilterAfterSettings, GeneralSettings, QuerySettings, Settings
 
 
 @pytest.fixture
@@ -22,6 +22,7 @@ def settings() -> Settings:
             order_by="publication_time",
             label="not_from_agency",
         ),
+        filter_after=FilterAfterSettings(excluded_companies=["Альфа", "Бета"]),
         general=GeneralSettings(
             num_workers=3,
             save_results_to_json=False,
@@ -47,6 +48,7 @@ def test_data_collector_constructor(settings: Settings) -> None:
         "order_by": "publication_time",
         "label": "not_from_agency",
     }
+    assert dc.excluded_companies == ["Альфа", "Бета"]
     assert dc.num_workers == 3
 
 

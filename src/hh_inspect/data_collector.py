@@ -22,6 +22,7 @@ class DataCollector:
         self.query_params = settings.convert_query_to_dict()
         self.query_params["page"] = 0  # to be used later
         self.num_workers = max(settings.general.num_workers, 1)
+        self.excluded_companies = settings.filter_after.excluded_companies
 
     def collect_vacancies(self) -> list[Vacancy]:
         num_pages: Final = self._get_num_pages()
@@ -64,6 +65,10 @@ class DataCollector:
         return ids
 
     def _build_vacancy_list(self, vacancy_ids: list[str]) -> list[Vacancy]:
+        def company_is_ok(vacancy: Vacancy) -> bool:
+            employer_name: Final = vacancy.employer_name.lower()
+            return not any(name.lower() in employer_name for name in self.excluded_companies)
+
         vacancy_list: list[Vacancy] = []
         with ThreadPoolExecutor(max_workers=self.num_workers) as executor:
             vacancy_list.extend(
@@ -75,7 +80,7 @@ class DataCollector:
                         ncols=100,
                         total=len(vacancy_ids),
                     )
-                    if vacancy is not None
+                    if vacancy is not None and company_is_ok(vacancy)
                 ]
             )
         return vacancy_list

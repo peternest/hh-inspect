@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from hh_inspect.settings import GeneralSettings, QuerySettings, Settings
+from hh_inspect.settings import FilterAfterSettings, GeneralSettings, QuerySettings, Settings
 
 
 def test_default_settings() -> None:
@@ -11,6 +11,7 @@ def test_default_settings() -> None:
     assert st.query.salary == 100000
     assert st.query.experience is None
     assert st.query.label is None
+    assert st.filter_after.excluded_companies == []
     assert st.general.num_workers == 1
     assert st.general.save_results_to_csv is True
     assert st.general.save_results_to_json is True
@@ -61,6 +62,7 @@ def test_regular_settings() -> None:
             order_by="publication_time",
             label="not_from_agency",
         ),
+        filter_after=FilterAfterSettings(excluded_companies=["Альфа", "Бета"]),
         general=GeneralSettings(
             num_workers=3,
             save_results_to_json=False,
@@ -79,6 +81,8 @@ def test_regular_settings() -> None:
     assert st.query.per_page == 50
     assert st.query.order_by == "publication_time"
     assert st.query.label == "not_from_agency"
+
+    assert st.filter_after.excluded_companies == ["Альфа", "Бета"]
 
     assert st.general.num_workers == 3
     assert st.general.save_results_to_json is False

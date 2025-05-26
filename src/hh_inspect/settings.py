@@ -44,6 +44,10 @@ class QuerySettings(BaseModel):
         return self.model_dump(exclude_none=True)
 
 
+class FilterAfterSettings(BaseModel):
+    excluded_companies: list[str] = []
+
+
 class GeneralSettings(BaseModel):
     num_workers: int = 1
     save_results_to_csv: bool = True
@@ -54,6 +58,7 @@ class Settings(BaseSettings):
     # https://docs.pydantic.dev/latest/concepts/pydantic_settings/#the-basics
 
     query: QuerySettings = QuerySettings()
+    filter_after: FilterAfterSettings = FilterAfterSettings()
     general: GeneralSettings = GeneralSettings()
 
     def convert_query_to_dict(self) -> QueryDict:

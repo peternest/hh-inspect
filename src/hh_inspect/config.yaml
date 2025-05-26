@@ -28,8 +28,12 @@ query:
   order_by: "publication_time"  # упорядочить вывод по дате публикации
   label: "not_from_agency"  # исключить объявления от кадровых агентств
 
-  # Прочие параметры запроса
+  # Прочие параметры запроса (НЕ РЕАЛИЗОВАНО)
   # other_params: "&area=3&employment_form=full"
+
+filter_after:
+  # Список названий компаний для исключения из списка после выборки
+  excluded_companies: ["Алабуга", "Вега", "Тензор", "Вологодское"]
 
 general:
   num_workers: 3
