@@ -41,13 +41,14 @@ class Vacancy:
     key_skills: list[str]
     description: str
     vacancy_url: str
+    published_at: str
 
     def __repr__(self) -> str:
         return (
             f"{self.__class__.__name__}("
             f"{self.vacancy_id}, "
             f"{self.employer_name[:35]:35}, {self.employer_city[:15]:15}, {self.vacancy_name[:35]:35}, "
-            f"({self.salary_from:6}, {self.salary_to:6})"
+            f"({self.salary_from:6}, {self.salary_to:6}), {self.published_at}"
             f")"
         )
 
@@ -142,6 +143,7 @@ class FullVacancy:
             key_skills=self.key_skills,
             description=remove_html_tags(self.description),
             vacancy_url=self.vacancy_url,
+            published_at=self.published_at[:10],
         )
 
 
