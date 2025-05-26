@@ -12,7 +12,7 @@ def settings() -> Settings:
         query=QuerySettings(
             text="QueryText",
             excluded_text="no_senior",
-            search_field="name",
+            search_field=["name"],
             area=["1", "2"],
             professional_role=["96", "165"],
             salary=100000,
@@ -37,7 +37,7 @@ def test_data_collector_constructor(settings: Settings) -> None:
         "page": 0,
         "text": "QueryText",
         "excluded_text": "no_senior",
-        "search_field": "name",
+        "search_field": ["name"],
         "area": ["1", "2"],
         "professional_role": ["96", "165"],
         "salary": 100000,

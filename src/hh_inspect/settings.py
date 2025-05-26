@@ -30,7 +30,7 @@ _DEFAULT_CONFIG: Final[LiteralString] = "config.yaml"
 class QuerySettings(BaseModel):
     text: str = "Python"
     excluded_text: str = ""
-    search_field: str = "name"
+    search_field: list[str] = ["name"]
     area: list[str] = ["2"]
     professional_role: list[str] = ["96"]
     salary: int = 100000
@@ -46,8 +46,8 @@ class QuerySettings(BaseModel):
 
 class GeneralSettings(BaseModel):
     num_workers: int = 1
-    save_results_to_csv: bool = False
-    save_results_to_json: bool = False
+    save_results_to_csv: bool = True
+    save_results_to_json: bool = True
 
 
 class Settings(BaseSettings):

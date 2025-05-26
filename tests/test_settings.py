@@ -12,8 +12,8 @@ def test_default_settings() -> None:
     assert st.query.experience is None
     assert st.query.label is None
     assert st.general.num_workers == 1
-    assert st.general.save_results_to_csv is False
-    assert st.general.save_results_to_json is False
+    assert st.general.save_results_to_csv is True
+    assert st.general.save_results_to_json is True
 
 
 def test_partial_query_settings() -> None:
@@ -51,7 +51,7 @@ def test_regular_settings() -> None:
         query=QuerySettings(
             text="QueryText",
             excluded_text="no_senior",
-            search_field="name",
+            search_field=["name", "company"],
             area=["1", "2"],
             professional_role=["96", "165"],
             salary=100000,
@@ -64,13 +64,13 @@ def test_regular_settings() -> None:
         general=GeneralSettings(
             num_workers=3,
             save_results_to_json=False,
-            save_results_to_csv=False,
+            save_results_to_csv=True,
         ),
     )
 
     assert st.query.text == "QueryText"
     assert st.query.excluded_text == "no_senior"
-    assert st.query.search_field == "name"
+    assert st.query.search_field == ["name", "company"]
     assert st.query.area == ["1", "2"]
     assert st.query.professional_role == ["96", "165"]
     assert st.query.salary == 100000
@@ -82,4 +82,4 @@ def test_regular_settings() -> None:
 
     assert st.general.num_workers == 3
     assert st.general.save_results_to_json is False
-    assert st.general.save_results_to_csv is False
+    assert st.general.save_results_to_csv is True
