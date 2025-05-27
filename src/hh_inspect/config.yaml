@@ -37,5 +37,6 @@ filter_after:
 
 general:
   num_workers: 3
+  print_output_to_console: true
   save_results_to_csv: true
   save_results_to_json: true

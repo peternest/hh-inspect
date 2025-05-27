@@ -5,6 +5,7 @@ from typing import Final, LiteralString
 import requests
 from tqdm import tqdm
 
+from hh_inspect.console_printer import ConsolePrinter
 from hh_inspect.settings import Settings
 from hh_inspect.vacancy import Vacancy, parse_vacancy_data
 
@@ -15,6 +16,7 @@ RESPONSE_OK: Final = 200
 _API_URL: Final[LiteralString] = "https://api.hh.ru/vacancies/"
 
 logger = logging.getLogger(__name__)
+printer = ConsolePrinter()
 
 
 class DataCollector:
@@ -35,7 +37,7 @@ class DataCollector:
         url: Final = f"{_API_URL}"
         response = requests.get(url, params=self.query_params, timeout=REQUEST_TIMEOUT)
         logger.info(f"Requested '{response.url}'")
-        print(f"Requested '{response.url}'")
+        printer.print(f"Requested '{response.url}'")
 
         if response.status_code != RESPONSE_OK:
             logger.error(f"Code: {response.status_code}")
@@ -46,7 +48,7 @@ class DataCollector:
         found: Final[int] = response.json().get("found", 0)
         num_pages: Final[int] = response.json().get("pages", 0)
         logger.info(f"found: {found}, num_pages: {num_pages}")
-        print(f"Found: {found}")
+        printer.print(f"Found: {found}")
         return num_pages
 
     def _build_vacancy_ids(self, num_pages: int) -> list[str]:

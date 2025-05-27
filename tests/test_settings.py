@@ -65,6 +65,7 @@ def test_regular_settings() -> None:
         filter_after=FilterAfterSettings(excluded_companies=["Альфа", "Бета"]),
         general=GeneralSettings(
             num_workers=3,
+            print_output_to_console=False,
             save_results_to_json=False,
             save_results_to_csv=True,
         ),
@@ -85,5 +86,6 @@ def test_regular_settings() -> None:
     assert st.filter_after.excluded_companies == ["Альфа", "Бета"]
 
     assert st.general.num_workers == 3
+    assert st.general.print_output_to_console is False
     assert st.general.save_results_to_json is False
     assert st.general.save_results_to_csv is True

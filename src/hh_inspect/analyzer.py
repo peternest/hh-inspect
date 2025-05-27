@@ -1,13 +1,15 @@
 import logging
-from typing import Final, reveal_type
+from typing import Final
 from collections import Counter
 import re
 
 import pandas as pd
 
+from hh_inspect.console_printer import ConsolePrinter
 from hh_inspect.vacancy import Vacancy
 
 logger = logging.getLogger(__name__)
+printer = ConsolePrinter()
 
 pd.set_option("display.max_colwidth", 35)
 
@@ -30,11 +32,11 @@ class Analyzer:
             max_salary = df[field_name].max()
             mean_salary = df[field_name].mean()
             median_salary = df[field_name].median()
-            print(
+            printer.print(
                 f"{prefix} min: {min_salary}, max: {max_salary}, mean: {mean_salary:.0f}, median: {median_salary:.0f}"
             )
 
-        print("")
+        printer.print("")
         print_salary_stat("SALARY FROM", "salary_from")
         print_salary_stat("SALARY TO", "salary_to")
 
@@ -45,9 +47,9 @@ class Analyzer:
         skills_list: Final = [x for elem in key_skills_list for x in elem]
         top_skills: Final = Analyzer.find_top_words_in_list(skills_list)
 
-        print(f"\nThe {print_amount} most frequently used words in Key skills:")
+        printer.print(f"\nThe {print_amount} most frequently used words in Key skills:")
         for key, value in top_skills[:print_amount]:
-            print(f"{key[:20]:20} {value}")
+            printer.print(f"{key[:20]:20} {value}")
 
     def analyze_description(self, print_amount: int = 15) -> None:
         df: Final = self.working_df
@@ -59,9 +61,9 @@ class Analyzer:
         filtered: Final = filter(lambda w: w not in noise_words, eng_words_list)
         top_skills: Final = Analyzer.find_top_words_in_list(filtered)
 
-        print(f"\nThe {print_amount} most frequently used words in Description:")
+        printer.print(f"\nThe {print_amount} most frequently used words in Description:")
         for key, value in top_skills[:print_amount]:
-            print(f"{key[:20]:20} {value}")
+            printer.print(f"{key[:20]:20} {value}")
 
     @staticmethod
     def find_top_words_in_list(lst: list[str]) -> list[tuple[str, int]]:

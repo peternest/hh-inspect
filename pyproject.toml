@@ -63,7 +63,6 @@ ignore = [
     "PTH123",  # `open()` should be replaced by `Path.open()`
     "RUF002",  # docstring contains ambiguous `{}`
     "RUF003",  # comment contains ambiguous `{}`
-    "T201",  # `print` found
     "TRY003"  # avoid specifying long messages outside the exception class
 ]
 exclude = ["src/hh_inspect/analyzer.py"]

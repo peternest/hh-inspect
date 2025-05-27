@@ -2,6 +2,7 @@ import logging
 from typing import Final, LiteralString
 
 from hh_inspect.analyzer import Analyzer
+from hh_inspect.console_printer import ConsolePrinter
 from hh_inspect.data_collector import DataCollector
 from hh_inspect.settings import Settings, load_settings
 from hh_inspect.vacancy import Vacancy, save_vacancies_to_json
@@ -19,14 +20,15 @@ logging.basicConfig(
     level=logging.INFO,
 )
 logger = logging.getLogger(__name__)
+printer = ConsolePrinter()
 
 
 class HHInspector:
     """Main controller class to retrieve vacancies from HH and analyze them."""
 
-    settings: Settings
-    collector: DataCollector
     analyzer: Analyzer
+    collector: DataCollector
+    settings: Settings
 
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
@@ -53,14 +55,18 @@ class HHInspector:
         self.analyzer.analyze_description()
 
     def print_vacancies(self, vacancies: list[Vacancy]) -> None:
-        print(f"Displaying: {len(vacancies)}")
+        printer.print(f"Displaying: {len(vacancies)}")
         for vac in vacancies:
-            print(vac)
+            printer.print(vac)
 
 
 def main() -> None:
     logger.info("HH Inspector started")
-    hh = HHInspector(load_settings())
+
+    settings: Final = load_settings()
+    ConsolePrinter(settings.general.print_output_to_console)
+
+    hh = HHInspector(settings)
     vacancies: Final = hh.collect_vacancies()
     hh.print_vacancies(vacancies)
     hh.analyze_vacancies(vacancies)

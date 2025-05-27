@@ -50,6 +50,7 @@ class FilterAfterSettings(BaseModel):
 
 class GeneralSettings(BaseModel):
     num_workers: int = 1
+    print_output_to_console: bool = True
     save_results_to_csv: bool = True
     save_results_to_json: bool = True
 
@@ -93,7 +94,7 @@ def load_settings() -> Settings:
         settings = FileOnlySettings.load_from_config()
     except ValidationError:
         logger.exception("Failed to load settings. Using default values.")
-        print("Failed to load settings. Using default values.")
+        print("Failed to load settings. Using default values.")  # noqa: T201
         return DefaultSettings()
     else:
         _parse_args(settings, sys.argv[1:])

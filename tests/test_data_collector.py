@@ -25,6 +25,7 @@ def settings() -> Settings:
         filter_after=FilterAfterSettings(excluded_companies=["Альфа", "Бета"]),
         general=GeneralSettings(
             num_workers=3,
+            print_output_to_console=False,
             save_results_to_json=False,
             save_results_to_csv=False,
         ),
