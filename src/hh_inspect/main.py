@@ -44,25 +44,23 @@ class HHInspector:
         return vacancies
 
     def analyze_vacancies(self, vacancies: list[Vacancy]) -> None:
-        return
-
         self.analyzer = Analyzer(vacancies)
         if self.settings.general.save_results_to_csv:
             self.analyzer.save_vacancies_to_csv(_CSV_FILENAME)
 
         self.analyzer.analyze_salary()
-        self.analyzer.analyze_words()
+        self.analyzer.analyze_key_skills()
+        self.analyzer.analyze_description()
 
     def print_vacancies(self, vacancies: list[Vacancy]) -> None:
+        print(f"Displaying: {len(vacancies)}")
         for vac in vacancies:
             print(vac)
 
 
 def main() -> None:
     logger.info("HH Inspector started")
-    settings = load_settings()
-
-    hh = HHInspector(settings)
+    hh = HHInspector(load_settings())
     vacancies: Final = hh.collect_vacancies()
     hh.print_vacancies(vacancies)
     hh.analyze_vacancies(vacancies)

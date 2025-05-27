@@ -1,5 +1,7 @@
 import logging
-from typing import Final
+from typing import Final, reveal_type
+from collections import Counter
+import re
 
 import pandas as pd
 
@@ -20,37 +22,48 @@ class Analyzer:
         self.working_df.to_csv(filename, index=False)
 
     def analyze_salary(self) -> None:
-        df: Final = self.working_df[["employer_name", "vacancy_name", "salary_from", "salary_to", "key_skills"]]
-        print(df)
-        # print(df.describe())
+        df: Final = self.working_df[["employer_name", "vacancy_name", "salary_from", "salary_to"]]
+        # print(f"\n{df.describe()}")
 
-        print(f"\nNumber of vacancies: {len(df)}")
+        def print_salary_stat(prefix: str, field_name: str) -> None:
+            min_salary = df[field_name].min()
+            max_salary = df[field_name].max()
+            mean_salary = df[field_name].mean()
+            median_salary = df[field_name].median()
+            print(
+                f"{prefix} min: {min_salary}, max: {max_salary}, mean: {mean_salary:.0f}, median: {median_salary:.0f}"
+            )
 
-        max_value = df["salary_to"].max()
-        print(f"\nMax salary: {max_value}")
-        rows_with_max = df.loc[df["salary_to"] == max_value]
-        print(rows_with_max)
+        print("")
+        print_salary_stat("SALARY FROM", "salary_from")
+        print_salary_stat("SALARY TO", "salary_to")
 
-        df_filtered = df[df["salary_from"] > 0]
-        min_value = df_filtered["salary_from"].min()
-        print(f"\nMin salary: {min_value}")
-        rows_with_min = df_filtered.loc[df_filtered["salary_from"] == min_value]
-        print(rows_with_min)
+    def analyze_key_skills(self, print_amount: int = 10) -> None:
+        df: Final = self.working_df
 
-    def analyze_words(self) -> None:
-        df: Final = self.working_df[["employer_name", "vacancy_name", "salary_from", "salary_to", "key_skills"]]
+        key_skills_list: list[list[str]] = df["key_skills"].to_list()
+        skills_list: Final = [x for elem in key_skills_list for x in elem]
+        top_skills: Final = Analyzer.find_top_words_in_list(skills_list)
 
-        print("\nMost frequently used words in Key skills:")
-        top_skills = self.find_top_words_from_keys(df["key_skills"].to_list())
-        print(top_skills[:12])
+        print(f"\nThe {print_amount} most frequently used words in Key skills:")
+        for key, value in top_skills[:print_amount]:
+            print(f"{key[:20]:20} {value}")
+
+    def analyze_description(self, print_amount: int = 15) -> None:
+        df: Final = self.working_df
+
+        noise_words: Final = set(["API", "IT", "quot", "and", "or", "I", "it"])
+
+        words_list: Final = " ".join(df["description"].to_list())
+        eng_words_list: Final = re.findall("[a-zA-Z_]+", words_list)
+        filtered: Final = filter(lambda w: w not in noise_words, eng_words_list)
+        top_skills: Final = Analyzer.find_top_words_in_list(filtered)
+
+        print(f"\nThe {print_amount} most frequently used words in Description:")
+        for key, value in top_skills[:print_amount]:
+            print(f"{key[:20]:20} {value}")
 
     @staticmethod
-    def find_top_words_from_keys(keys_list: list[str]) -> pd.Series:
-        lst_keys = []
-        for keys_elem in keys_list:
-            lst_keys.extend([el for el in keys_elem if el != ""])
-
-        set_keys = set(lst_keys)
-        dict_keys = {el: lst_keys.count(el) for el in set_keys}
-        sorted_keys = dict(sorted(dict_keys.items(), key=lambda x: x[1], reverse=True))
-        return pd.Series(sorted_keys, name="key_skills")
+    def find_top_words_in_list(lst: list[str]) -> list[tuple[str, int]]:
+        words_counter: Final = Counter(lst)
+        return sorted(words_counter.items(), key=lambda x: x[1], reverse=True)
