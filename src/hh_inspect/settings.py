@@ -13,7 +13,7 @@ type QueryValue = str | int | bool
 type QueryDict = dict[str, QueryValue | list[QueryValue]]
 
 # fmt: off
-EXCHANGE_RATES: Final[dict[LiteralString, float]] = {
+EXCHANGE_RATES: Final[dict[str, float]] = {
     "RUR": 1.0,
     "USD": 80.0,
     "EUR": 90.0,

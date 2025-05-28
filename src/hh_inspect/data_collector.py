@@ -1,6 +1,6 @@
 import logging
 from concurrent.futures import ThreadPoolExecutor
-from typing import Final, LiteralString
+from typing import Any, Final, LiteralString
 
 import requests
 from tqdm import tqdm
@@ -54,15 +54,13 @@ class DataCollector:
     def _build_vacancy_ids(self, num_pages: int) -> list[str]:
         url: Final = f"{_API_URL}"
         ids: list[str] = []
-        for idx in range(num_pages + 1):
+        for idx in range(num_pages):
             self.query_params["page"] = idx
             response = requests.get(url, params=self.query_params, timeout=REQUEST_TIMEOUT)
             logger.info(f"Requested '{response.url}'")
             data = response.json()
             if response.status_code != RESPONSE_OK:
                 logger.error(f"Code: {response.status_code}")
-            if "items" not in data:
-                break
             ids.extend(x["id"] for x in data["items"])
         return ids
 
@@ -93,11 +91,11 @@ class DataCollector:
             response: Final = requests.get(url, timeout=REQUEST_TIMEOUT)
         except requests.exceptions.ConnectTimeout:
             logger.exception("Timeout")
+        else:
+            vacancy_json: Final[dict[str, Any]] = response.json()
+            # print(response.status_code, json.dumps(vacancy_json, ensure_ascii=False, indent=2))  # noqa: ERA001
 
-        vacancy_json: Final = response.json()
-        # print(response.status_code, json.dumps(vacancy_json, ensure_ascii=False, indent=2))  # noqa: ERA001
-
-        if response.status_code == RESPONSE_OK:
-            full_vac = parse_vacancy_data(vacancy_json)
-            return full_vac.to_basic_vacancy()
+            if response.status_code == RESPONSE_OK:
+                full_vac = parse_vacancy_data(vacancy_json)
+                return full_vac.to_basic_vacancy()
         return None

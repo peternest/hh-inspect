@@ -31,7 +31,7 @@ def test_partial_general_settings() -> None:
 
 def test_invalid_salary_type() -> None:
     with pytest.raises(ValidationError):
-        QuerySettings(salary="not_a_number")  # salary must be int
+        QuerySettings(salary="not_a_number")  # type: ignore  # noqa: PGH003
 
 
 def test_list_fields() -> None:

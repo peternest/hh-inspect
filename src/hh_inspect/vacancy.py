@@ -4,14 +4,14 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, Final
 
 from hh_inspect.settings import EXCHANGE_RATES
-from hh_inspect.utils import remove_html_tags
+from hh_inspect.utils import get_field_value, remove_html_tags
 
 
 logger = logging.getLogger(__name__)
 
 _TAX_RATE: Final = 0.13
 
-_FIX_SALARY_TO: Final = True
+_FIX_SALARY_TO: Final = True  # If salary_to is not set, make it = salary_from * _FIX_SALARY_TO_COEF
 _FIX_SALARY_TO_COEF: Final = 1.1
 
 # Some optional fields in models are marked according to specification at
@@ -62,7 +62,7 @@ class Area:
 
 @dataclass
 class Address:
-    city: str
+    city: str | None
     street: str
     building: str
     description: str
@@ -72,9 +72,9 @@ class Address:
 @dataclass
 class Employer:
     id: str
-    name: str
+    name: str | None
     trusted: bool
-    accredited_it_employer: bool
+    accredited_it_employer: bool | None
     url: str
 
 
@@ -111,7 +111,6 @@ class FullVacancy:
     schedule: str
     description: str = field(repr=False)
     type: str
-    premium: bool
     published_at: str
     vacancy_url: str = field(repr=False)  # original 'alternate_url'
 
@@ -128,12 +127,20 @@ class FullVacancy:
                 return self.address.city
             return ""
 
+        def get_employer_accreditation() -> bool:
+            if self.employer is not None and self.employer.accredited_it_employer is not None:
+                return self.employer.accredited_it_employer
+            return False
+
+        def get_published_date() -> str:
+            return self.published_at[:10]
+
         return Vacancy(
             vacancy_id=self.vacancy_id,
             vacancy_name=self.vacancy_name,
             employer_name=get_employer_name(),
             employer_city=get_employer_city(),
-            accredited_it=(self.employer.accredited_it_employer if self.employer is not None else False),
+            accredited_it=get_employer_accreditation(),
             region=self.area.name,
             salary_from=salary_from,
             salary_to=salary_to,
@@ -143,21 +150,11 @@ class FullVacancy:
             key_skills=self.key_skills,
             description=remove_html_tags(self.description),
             vacancy_url=self.vacancy_url,
-            published_at=self.published_at[:10],
+            published_at=get_published_date(),
         )
 
 
-def parse_vacancy_data(vac_json: Any) -> FullVacancy:  # noqa: C901
-    def _get_subfield_value(vac_json: Any, field1: str, field2: str) -> str:
-        """Return value of a dict subobject or "" if missing.
-
-        Example: json = {"frequency": {"name": "zzz"}} or {"frequency": null}
-        """
-        dict_or_none = vac_json.get(field1)
-        if isinstance(dict_or_none, dict):
-            return str(dict_or_none.get(field2, ""))
-        return ""
-
+def parse_vacancy_data(vac_json: dict[str, Any]) -> FullVacancy:
     def parse_address(data: dict[str, Any] | None) -> Address | None:
         if not data:
             return None
@@ -185,11 +182,11 @@ def parse_vacancy_data(vac_json: Any) -> FullVacancy:  # noqa: C901
             return None
         return SalaryRange(
             currency=data.get("currency", ""),
-            frequency=_get_subfield_value(data, "frequency", "name"),
+            frequency=get_field_value(data, "frequency", "name"),
             from_=data.get("from"),
             to=data.get("to"),
             gross=data.get("gross", False),
-            mode=_get_subfield_value(data, "mode", "name"),
+            mode=get_field_value(data, "mode", "name"),
         )
 
     def parse_professional_roles(data: list[dict[str, Any]] | None) -> list[ProfessionalRole]:
@@ -214,14 +211,13 @@ def parse_vacancy_data(vac_json: Any) -> FullVacancy:  # noqa: C901
         address=parse_address(vac_json.get("address")),
         description=vac_json.get("description", ""),
         employer=parse_employer(vac_json.get("employer")),
-        employment=_get_subfield_value(vac_json, "employment", "name"),
-        experience=_get_subfield_value(vac_json, "experience", "name"),
+        employment=get_field_value(vac_json, "employment", "name"),
+        experience=get_field_value(vac_json, "experience", "name"),
         key_skills=[skill["name"] for skill in vac_json.get("key_skills", [])],
         professional_roles=parse_professional_roles(vac_json.get("professional_roles")),
         salary_range=parse_salary_range(vac_json.get("salary_range")),
-        schedule=_get_subfield_value(vac_json, "schedule", "name"),
-        type=_get_subfield_value(vac_json, "type", "name"),
-        premium=vac_json.get("premium", False),
+        schedule=get_field_value(vac_json, "schedule", "name"),
+        type=get_field_value(vac_json, "type", "name"),
         published_at=vac_json.get("published_at", ""),
         vacancy_url=vac_json.get("alternate_url", ""),
     )
@@ -236,13 +232,13 @@ def _extract_and_calc_salary(salary_range: SalaryRange | None) -> tuple[int, int
     rate: Final = EXCHANGE_RATES.get(currency, 1.0)
     gross_coef: Final = (1 - _TAX_RATE) if salary_dict.get("gross") else 1
 
-    salary_from: int = 0
-    if salary_dict.get("from_") is not None:
-        salary_from = int(salary_dict.get("from_") * rate * gross_coef)
+    raw_value = salary_dict.get("from_")
+    salary_from_val: Final = raw_value if raw_value is not None else 0.0
+    salary_from: Final = int(salary_from_val * rate * gross_coef)
 
-    salary_to: int = 0
-    if salary_dict.get("to") is not None:
-        salary_to = int(salary_dict.get("to") * rate * gross_coef)
+    raw_value = salary_dict.get("to")
+    salary_to_val: Final = raw_value if raw_value is not None else 0.0
+    salary_to = int(salary_to_val * rate * gross_coef)
 
     if salary_to == 0 and _FIX_SALARY_TO:
         salary_to = int(salary_from * _FIX_SALARY_TO_COEF)

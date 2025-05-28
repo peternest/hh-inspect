@@ -43,7 +43,6 @@ def test_parse_vacancy_data(example_vacancy: FullVacancy) -> None:
     assert len(vac.professional_roles) == 1
     assert vac.professional_roles[0].id == "96"
     assert vac.professional_roles[0].name == "Программист, разработчик"
-    assert vac.premium is True
     assert vac.published_at == "2025-05-15T15:15:15+0300"
     assert vac.vacancy_url == "https://hh.ru/vacancy/12345"
 

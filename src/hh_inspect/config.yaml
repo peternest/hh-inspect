@@ -24,7 +24,7 @@ query:
   # Опыт работы, допустимые значения [no, between1And3, between3And6, moreThan6]
   experience: ["between1And3", "between3And6"]
 
-  per_page: 50  # сколько выдывать вакансий на страницу (максимум 100)
+  per_page: 20  # сколько выдывать вакансий на страницу (максимум 100)
   order_by: "publication_time"  # упорядочить вывод по дате публикации
   label: "not_from_agency"  # исключить объявления от кадровых агентств
 
