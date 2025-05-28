@@ -81,6 +81,15 @@ lines-after-imports = 2
     "S311"  # standard pseudo-random generators are not suitable for cryptographic purposes
 ]
 
+[tool.pyright]
+typeCheckingMode = "strict"
+pythonVersion = "3.13"
+exclude = [
+    "src/unused",
+    ".venv"
+]
+# reportPrivateUsage = false
+
 [tool.pytest.ini_options]
 addopts = [
     "--color=no",
