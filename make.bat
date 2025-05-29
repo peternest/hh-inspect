@@ -46,6 +46,7 @@ uv sync -q
 uv --version
 .venv\Scripts\ruff --version
 .venv\Scripts\mypy --version
+.venv\Scripts\pyright --version
 .venv\Scripts\pytest --version
 goto end
 

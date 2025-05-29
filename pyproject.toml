@@ -75,6 +75,7 @@ lines-after-imports = 2
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*.py" = [
+    "ARG001",  # unused function argument `{}`
     "PLR2004",  # magic value used in comparison, consider replacing {} with constant variable
     "RUF001",  # string contains ambiguous `{}`
     "S101",  # use of `assert` detected 
