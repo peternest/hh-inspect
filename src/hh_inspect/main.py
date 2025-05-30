@@ -50,9 +50,9 @@ class HHInspector:
         if self.settings.general.save_results_to_csv:
             self.analyzer.save_vacancies_to_csv(_CSV_FILENAME)
 
-        self.analyzer.analyze_salary()
-        self.analyzer.analyze_key_skills()
-        self.analyzer.analyze_description()
+        self.analyzer.print_salary_stats()
+        self.analyzer.print_top_key_skills()
+        self.analyzer.print_top_words_in_description()
 
     def print_vacancies(self, vacancies: list[Vacancy]) -> None:
         printer.print(f"Displaying: {len(vacancies)}")
