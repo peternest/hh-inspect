@@ -33,8 +33,8 @@ class QuerySettings(BaseModel):
     search_field: list[str] = ["name"]
     area: list[str] = ["2"]
     professional_role: list[str] = ["96"]
-    salary: int = 100000
-    only_with_salary: bool = True
+    salary: int = 0
+    only_with_salary: bool = False
     experience: list[str] | None = None
     per_page: int = 20
     order_by: str = "publication_time"

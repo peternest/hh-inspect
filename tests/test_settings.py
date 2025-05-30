@@ -8,7 +8,7 @@ def test_default_settings() -> None:
     st = Settings()
 
     assert st.query.text == "Python"
-    assert st.query.salary == 100000
+    assert st.query.salary == 0
     assert st.query.experience is None
     assert st.query.label is None
     assert st.filter_after.excluded_companies == []
