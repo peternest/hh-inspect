@@ -8,9 +8,9 @@ from hh_inspect.settings import Settings, load_settings
 from hh_inspect.vacancy import Vacancy, save_vacancies_to_json
 
 
-_LOG_FILENAME: Final[LiteralString] = "../data/hh_inspect.log"
-_JSON_FILENAME: Final[LiteralString] = "../data/vacancies.json"
-_CSV_FILENAME: Final[LiteralString] = "../data/vacancies.csv"
+_LOG_FILENAME: Final[LiteralString] = "../../output/hh_inspect.log"
+_JSON_FILENAME: Final[LiteralString] = "../../output/vacancies.json"
+_CSV_FILENAME: Final[LiteralString] = "../../output/vacancies.csv"
 
 logging.basicConfig(
     format="[%(asctime)s - %(name)s:%(lineno)d - %(levelname)s] %(message)s",

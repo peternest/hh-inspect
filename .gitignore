@@ -1,9 +1,7 @@
-# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Environments
 .env
 .venv
 env/
@@ -16,10 +14,9 @@ venv/
 .ruff_cache
 .coverage
 
-src/data/*
 src/unused/*
-src/tests/*
-**/*.log
+output/*
+!output/.keep
 
 HH_API.md
 TODO.md
