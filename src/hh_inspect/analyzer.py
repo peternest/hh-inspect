@@ -1,3 +1,6 @@
+# pyright: reportUnknownMemberType = false
+# pyright: reportUnknownVariableType = false
+
 import logging
 from typing import Final, Iterable
 import re
@@ -18,6 +21,7 @@ class Analyzer:
     def __init__(self, vacancies: list[Vacancy]) -> None:
         self.vacancies: Final = vacancies
         self.working_df: Final = pd.DataFrame([vars(v) for v in self.vacancies])
+        # print(self.working_df.dtypes)
 
     def save_vacancies_to_csv(self, filename: str) -> None:
         logger.info(f"Saving vacancies to '{filename}'...")
@@ -25,30 +29,34 @@ class Analyzer:
 
     def analyze_salary(self) -> None:
         printer.print("")
-        self._print_salary_stat("SALARY FROM", "salary_from")
-        self._print_salary_stat("SALARY TO", "salary_to")
+        self.calc_and_print_salary_stat("SALARY FROM", "salary_from")
+        self.calc_and_print_salary_stat("SALARY TO", "salary_to")
 
-    def _print_salary_stat(self, prefix: str, field_name: str) -> None:
+    def calc_and_print_salary_stat(self, prefix: str, field_name: str) -> None:
         """Print salary statistics for a given field."""
 
         if field_name not in self.working_df:
             logger.warning(f"Field '{field_name}' not found in working_df.")
             return
 
-        df_column: Final = self.working_df[field_name]  # type: ignore
-
-        min_salary: float = df_column.min()  # type: ignore
-        max_salary: float = df_column.max()  # type: ignore
-        mean_salary: float = df_column.mean()  # type: ignore
-        median_salary: float = df_column.median()  # type: ignore
+        stats: Final = self.calc_salary_stats(field_name)
         printer.print(
-            f"{prefix} min: {min_salary}, max: {max_salary}, mean: {mean_salary:.0f}, median: {median_salary:.0f}"
+            f"{prefix} min: {stats['min']}, max: {stats['max']}, mean: {stats['mean']:.0f}, median: {stats['median']:.0f}"
         )
 
-    def analyze_key_skills(self, print_amount: int = 10) -> None:
-        df_column: Final = self.working_df["key_skills"]  # type: ignore
+    def calc_salary_stats(self, field_name: str) -> dict[str, float]:
+        series: Final = self.working_df[field_name][self.working_df[field_name] > 0]
+        return {
+            "min": series.min(),
+            "max": series.max(),
+            "mean": series.mean(),
+            "median": series.median(),
+        }
 
-        key_skills_list: list[list[str]] = df_column.to_list()  # type: ignore
+    def analyze_key_skills(self, print_amount: int = 10) -> None:
+        df_column: Final = self.working_df["key_skills"]
+
+        key_skills_list: list[list[str]] = df_column.to_list()
         skills_list: Final = [x for elem in key_skills_list for x in elem]
         top_skills: Final = find_top_words_in_list(skills_list)
 
@@ -57,7 +65,7 @@ class Analyzer:
             printer.print(f"{key[:20]:20} {value}")
 
     def analyze_description(self, print_amount: int = 15) -> None:
-        df_column: Final = self.working_df["description"]  # type: ignore
+        df_column: Final = self.working_df["description"]
 
         words_list: Final = " ".join(df_column.to_list())  # type: ignore
         eng_words_list: Final[list[str]] = re.findall("[a-zA-Z_]+", words_list)
