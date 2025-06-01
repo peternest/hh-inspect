@@ -227,17 +227,17 @@ def _extract_and_calc_salary(salary_range: SalaryRange | None) -> tuple[int, int
     if salary_range is None:
         return (0, 0)
 
-    salary_dict: Final = asdict(salary_range)
+    salary_dict = asdict(salary_range)
     currency: Final[str] = salary_dict.get("currency", "")
-    rate: Final = EXCHANGE_RATES.get(currency, 1.0)
-    gross_coef: Final = (1 - _TAX_RATE) if salary_dict.get("gross") else 1
+    rate = EXCHANGE_RATES.get(currency, 1.0)
+    gross_coef = (1 - _TAX_RATE) if salary_dict.get("gross") else 1
 
     raw_value = salary_dict.get("from_")
-    salary_from_val: Final = raw_value if raw_value is not None else 0.0
-    salary_from: Final = int(salary_from_val * rate * gross_coef)
+    salary_from_val = raw_value if raw_value is not None else 0.0
+    salary_from = int(salary_from_val * rate * gross_coef)
 
     raw_value = salary_dict.get("to")
-    salary_to_val: Final = raw_value if raw_value is not None else 0.0
+    salary_to_val = raw_value if raw_value is not None else 0.0
     salary_to = int(salary_to_val * rate * gross_coef)
 
     if salary_to == 0 and _FIX_SALARY_TO:

@@ -26,10 +26,10 @@ class DataCollector:
         self.excluded_companies = settings.filter_after.excluded_companies
 
     def collect_vacancies(self) -> list[Vacancy]:
-        num_pages: Final = self._get_num_pages()
+        num_pages = self._get_num_pages()
         if num_pages == 0:
             return []
-        vacancy_ids: Final = self._build_vacancy_ids(num_pages)
+        vacancy_ids = self._build_vacancy_ids(num_pages)
         return self.build_vacancy_list(vacancy_ids)
 
     def _get_num_pages(self) -> int:
@@ -51,7 +51,7 @@ class DataCollector:
         return num_pages
 
     def _build_vacancy_ids(self, num_pages: int) -> list[str]:
-        url: Final = f"{_API_URL}"
+        url = f"{_API_URL}"
         ids: list[str] = []
         for idx in range(num_pages):
             params = self.query_params.copy()
@@ -68,7 +68,7 @@ class DataCollector:
 
     def build_vacancy_list(self, vacancy_ids: list[str]) -> list[Vacancy]:
         def company_is_ok(vacancy: Vacancy) -> bool:
-            employer_name: Final = vacancy.employer_name.lower()
+            employer_name = vacancy.employer_name.lower()
             return not any(name.lower() in employer_name for name in self.excluded_companies)
 
         vacancy_list: list[Vacancy] = []
@@ -88,13 +88,13 @@ class DataCollector:
         return vacancy_list
 
     def get_vacancy_or_none(self, vacancy_id: str) -> Vacancy | None:
-        url: Final = f"{_API_URL}{vacancy_id}"
+        url = f"{_API_URL}{vacancy_id}"
         try:
-            response: Final = requests.get(url, timeout=REQUEST_TIMEOUT)
+            response = requests.get(url, timeout=REQUEST_TIMEOUT)
         except requests.exceptions.ConnectTimeout:
             logger.exception("Timeout")
         else:
-            vacancy_json: Final[dict[str, Any]] = response.json()
+            vacancy_json: dict[str, Any] = response.json()
             # print(response.status_code, json.dumps(vacancy_json, ensure_ascii=False, indent=2))  # noqa: ERA001
 
             if response.status_code == RESPONSE_OK:

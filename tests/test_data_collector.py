@@ -34,7 +34,7 @@ def settings() -> Settings:
 
 
 def test_data_collector_constructor(settings: Settings) -> None:
-    dc: Final = DataCollector(settings)
+    dc = DataCollector(settings)
 
     assert dc.query_params == {
         "text": "QueryText",
@@ -54,7 +54,7 @@ def test_data_collector_constructor(settings: Settings) -> None:
 
 
 def test_collect_vacancies_no_pages(monkeypatch: pytest.MonkeyPatch, settings: Settings) -> None:
-    dc: Final = DataCollector(settings)
+    dc = DataCollector(settings)
 
     def patch_num_pages() -> int:
         return 0

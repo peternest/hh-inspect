@@ -36,7 +36,7 @@ class HHInspector:
 
     def collect_vacancies(self) -> list[Vacancy]:
         logger.info("Creating the list of vacancies...")
-        vacancies: Final = self.collector.collect_vacancies()
+        vacancies = self.collector.collect_vacancies()
 
         if len(vacancies) == 0:
             return []
@@ -63,10 +63,10 @@ class HHInspector:
 def main() -> None:
     logger.info("HH Inspector started")
 
-    settings: Final = load_settings()
+    settings = load_settings()
     ConsolePrinter(settings.general.print_output_to_console)
 
     hh = HHInspector(settings)
-    vacancies: Final = hh.collect_vacancies()
+    vacancies = hh.collect_vacancies()
     hh.print_vacancies(vacancies)
     hh.analyze_vacancies(vacancies)

@@ -3,7 +3,7 @@ from typing import Final
 
 import pytest
 
-from hh_inspect.vacancy import FullVacancy, Vacancy, parse_vacancy_data
+from hh_inspect.vacancy import FullVacancy, parse_vacancy_data
 
 
 @pytest.fixture
@@ -14,7 +14,7 @@ def example_vacancy() -> FullVacancy:
 
 
 def test_parse_vacancy_data(example_vacancy: FullVacancy) -> None:
-    vac: FullVacancy = example_vacancy
+    vac = example_vacancy
 
     assert vac.vacancy_id == "12345"
     assert vac.vacancy_name == "Инженер данных"
@@ -48,7 +48,7 @@ def test_parse_vacancy_data(example_vacancy: FullVacancy) -> None:
 
 
 def test_convert_to_basic_vacancy(example_vacancy: FullVacancy) -> None:
-    vac: Vacancy = example_vacancy.to_basic_vacancy()
+    vac = example_vacancy.to_basic_vacancy()
 
     assert vac.vacancy_id == "12345"
     assert vac.vacancy_name == "Инженер данных"

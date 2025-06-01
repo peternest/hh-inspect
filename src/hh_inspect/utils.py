@@ -1,11 +1,11 @@
 import re
 from collections import Counter
 from collections.abc import Iterable
-from typing import Any, Final
+from typing import Any
 
 
 def find_top_words_in_list(iterable: Iterable[str]) -> list[tuple[str, int]]:
-    words_counter: Final = Counter(iterable)
+    words_counter = Counter(iterable)
     return sorted(words_counter.items(), key=lambda x: x[1], reverse=True)
 
 
@@ -29,5 +29,5 @@ def get_field_value(obj: dict[str, Any], field1: str, field2: str) -> str:
 
 
 def remove_html_tags(html_text: str) -> str:
-    pattern: Final = re.compile("<.*?>")
+    pattern = re.compile("<.*?>")
     return re.sub(pattern, "", html_text)
