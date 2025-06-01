@@ -26,14 +26,14 @@ logger = logging.getLogger(__name__)
 
 _DEFAULT_CONFIG: Final[LiteralString] = "config.yaml"
 
-
+# Fields with None will not be included in query string.
 class QuerySettings(BaseModel):
     text: str = "Python"
     excluded_text: str = ""
-    search_field: list[str] = ["name"]
-    area: list[str] = ["2"]
-    professional_role: list[str] = ["96"]
-    salary: int = 0
+    search_field: list[str] = ["name", "company_name", "description"]
+    area: list[str] = ["113"]
+    professional_role: list[str] | None = None
+    salary: int | None = None
     only_with_salary: bool = False
     experience: list[str] | None = None
     per_page: int = 20

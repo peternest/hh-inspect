@@ -8,9 +8,11 @@ def test_default_settings() -> None:
     st = Settings()
 
     assert st.query.text == "Python"
-    assert st.query.salary == 0
+    assert st.query.salary is None
     assert st.query.experience is None
     assert st.query.label is None
+    assert st.query.search_field == ["name", "company_name", "description"]
+    assert st.query.area == ["113"]
     assert st.filter_after.excluded_companies == []
     assert st.general.num_workers == 1
     assert st.general.save_results_to_csv is True

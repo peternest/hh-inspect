@@ -8,20 +8,20 @@ query:
   text: "Python OR data OR дата"
   excluded_text: "senior"  # какие слова исключить из поиска
 
-  # Область поиска, допустимые значения [name, company_name, description]
+  # Область поиска, допустимые значения [name, company_name, description], по умолчанию все
   search_field: ["name"]
 
-  # Регионы, полный список здесь: https://api.hh.ru/areas/
+  # Регионы, полный список здесь: https://api.hh.ru/areas/, по умолчанию "Россия"
   area: ["2"]  # 1 = Москва, 2 = Санкт-Петербург, 113 = Россия
 
-  # Специализации, полный список здесь: https://api.hh.ru/professional_roles/
+  # Специализации, полный список здесь: https://api.hh.ru/professional_roles/, по умолчанию все
   professional_role: ["96", "165"]  # 96 = Программист, разработчик, 165 - Дата-сайентист
 
   # Уровень дохода
-  salary: 120000  # минимальная верхняя граница зарплаты (до вычета налогов)
+  salary: 120000  # минимальная верхняя граница зарплаты (до вычета налогов), по умолчанию 0
   only_with_salary: true  # только вакансии, где указана зарплата
 
-  # Опыт работы, допустимые значения [no, between1And3, between3And6, moreThan6]
+  # Опыт работы, допустимые значения [no, between1And3, between3And6, moreThan6], по умолчанию все
   experience: ["between1And3", "between3And6"]
 
   per_page: 20  # сколько выдывать вакансий на страницу (максимум 100)
