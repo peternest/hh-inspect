@@ -55,8 +55,10 @@ class HHInspector:
         self.analyzer.print_top_words_in_description()
 
     def print_vacancies(self, vacancies: list[Vacancy]) -> None:
-        printer.print(f"Displaying: {len(vacancies)}")
-        for vac in vacancies:
+        num_found = len(vacancies)
+        num_displaying = min(num_found, 20)
+        printer.print(f"Displaying {num_displaying} of {num_found}")
+        for vac in vacancies[:num_displaying]:
             printer.print(vac)
 
 
@@ -68,5 +70,6 @@ def main() -> None:
 
     hh = HHInspector(settings)
     vacancies = hh.collect_vacancies()
-    hh.print_vacancies(vacancies)
-    hh.analyze_vacancies(vacancies)
+    if len(vacancies):
+        hh.print_vacancies(vacancies)
+        hh.analyze_vacancies(vacancies)

@@ -8,7 +8,7 @@ query:
   text: "Python OR data OR дата"
   excluded_text: "senior"  # какие слова исключить из поиска
 
-  # Область поиска, допустимые значения [name, company_name, description], по умолчанию все
+  # Область поиска, допустимые значения [name, company_name, description], по умолчанию "name"
   search_field: ["name"]
 
   # Регионы, полный список здесь: https://api.hh.ru/areas/, по умолчанию "Россия"
@@ -24,12 +24,9 @@ query:
   # Опыт работы, допустимые значения [no, between1And3, between3And6, moreThan6], по умолчанию все
   experience: ["between1And3", "between3And6"]
 
-  per_page: 20  # сколько выдывать вакансий на страницу (максимум 100)
+  per_page: 25  # сколько выдывать вакансий на страницу (максимум 100)
   order_by: "publication_time"  # упорядочить вывод по дате публикации
   label: "not_from_agency"  # исключить объявления от кадровых агентств
-
-  # Прочие параметры запроса (НЕ РЕАЛИЗОВАНО)
-  # other_params: "&area=3&employment_form=full"
 
 filter_after:
   # Список названий компаний для исключения из списка после выборки

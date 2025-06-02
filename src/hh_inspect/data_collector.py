@@ -39,9 +39,11 @@ class DataCollector:
         printer.print(f"Requested '{response.url}'")
 
         if response.status_code != RESPONSE_OK:
-            logger.error(f"Code: {response.status_code}")
+            logger.error(f"Response code: {response.status_code}")
             logger.error(response.json())
             logger.error(f"Headers: {response.headers}")
+            printer.print(f"Response code: {response.status_code}")
+            printer.print(response.json())
             return 0
 
         found: Final[int] = response.json().get("found", 0)
