@@ -30,7 +30,7 @@ query:
 
 filter_after:
   # Список названий компаний для исключения из списка после выборки
-  excluded_companies: ["Алабуга", "Вега", "Тензор", "Вологодское"]
+  excluded_companies: []
 
 general:
   num_workers: 3
