@@ -4,6 +4,7 @@
 import logging
 from typing import Final, Iterable
 import re
+from pathlib import Path
 
 import pandas as pd
 
@@ -23,7 +24,7 @@ class Analyzer:
         self.working_df = pd.DataFrame([vars(v) for v in self.vacancies])
         # print(self.working_df.dtypes)
 
-    def save_vacancies_to_csv(self, filename: str) -> None:
+    def save_vacancies_to_csv(self, filename: Path) -> None:
         logger.info(f"Saving vacancies to '{filename}'...")
         self.working_df.to_csv(filename, index=False)
 
