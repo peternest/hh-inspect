@@ -2,7 +2,7 @@ import argparse
 import logging
 import sys
 from pathlib import Path
-from typing import Final, LiteralString
+from typing import Final
 
 import yaml
 from pydantic import BaseModel, ValidationError
@@ -24,7 +24,6 @@ EXCHANGE_RATES: Final[dict[str, float]] = {
 
 logger = logging.getLogger(__name__)
 
-_DEFAULT_CONFIG: Final[LiteralString] = "config.yaml"
 
 # Fields with None will not be included in query string.
 class QuerySettings(BaseModel):
@@ -79,19 +78,19 @@ class FileOnlySettings(Settings):
     model_config = SettingsConfigDict(cli_parse_args=False)
 
     @classmethod
-    def load_from_config(cls, config_file: str = _DEFAULT_CONFIG) -> "Settings":
-        if config_file and not Path(config_file).exists():
+    def load_from_config(cls, config_file: Path) -> "Settings":
+        if config_file and not config_file.exists():
             logger.error(f"Cannot find config file: '{config_file}'")
             return DefaultSettings()
 
-        with Path(config_file).open("r", encoding="utf-8") as f:
+        with config_file.open("r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
         return cls.model_validate(data)
 
 
-def load_settings() -> Settings:
+def load_settings(config_file: Path) -> Settings:
     try:
-        settings = FileOnlySettings.load_from_config()
+        settings = FileOnlySettings.load_from_config(config_file)
     except ValidationError:
         logger.exception("Failed to load settings, maybe incorrect YAML. Using default values.")
         print("Failed to load settings, maybe incorrect YAML. Using default values.")  # noqa: T201

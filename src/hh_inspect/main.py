@@ -1,5 +1,6 @@
 import logging
-from typing import Final, LiteralString
+from pathlib import Path
+from typing import Final
 
 from hh_inspect.analyzer import Analyzer
 from hh_inspect.console_printer import ConsolePrinter
@@ -8,9 +9,13 @@ from hh_inspect.settings import Settings, load_settings
 from hh_inspect.vacancy import Vacancy, save_vacancies_to_json
 
 
-_LOG_FILENAME: Final[LiteralString] = "../../output/hh_inspect.log"
-_JSON_FILENAME: Final[LiteralString] = "../../output/vacancies.json"
-_CSV_FILENAME: Final[LiteralString] = "../../output/vacancies.csv"
+_ROOT_DIR: Final = Path.resolve(Path(__file__).parent.parent.parent)
+
+_CONFIG_FILENAME: Final = _ROOT_DIR / "config.yaml"
+
+_LOG_FILENAME: Final = _ROOT_DIR / "output/hh_inspect.log"
+_JSON_FILENAME: Final = _ROOT_DIR / "output/vacancies.json"
+_CSV_FILENAME: Final = _ROOT_DIR / "output/vacancies.csv"
 
 logging.basicConfig(
     format="[%(asctime)s - %(name)s:%(lineno)d - %(levelname)s] %(message)s",
@@ -53,6 +58,7 @@ class HHInspector:
         self.analyzer.print_salary_stats()
         self.analyzer.print_top_key_skills()
         self.analyzer.print_top_words_in_description()
+        # self.analyzer.draw_plots()
 
     def print_vacancies(self, vacancies: list[Vacancy]) -> None:
         num_found = len(vacancies)
@@ -65,7 +71,7 @@ class HHInspector:
 def main() -> None:
     logger.info("HH Inspector started")
 
-    settings = load_settings()
+    settings = load_settings(_CONFIG_FILENAME)
     ConsolePrinter(settings.general.print_output_to_console)
 
     hh = HHInspector(settings)

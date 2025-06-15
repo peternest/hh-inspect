@@ -1,6 +1,7 @@
 import json
 import logging
 from dataclasses import asdict, dataclass, field
+from pathlib import Path
 from typing import Any, Final
 
 from hh_inspect.settings import EXCHANGE_RATES
@@ -246,7 +247,7 @@ def _extract_and_calc_salary(salary_range: SalaryRange | None) -> tuple[int, int
     return (salary_from, salary_to)
 
 
-def save_vacancies_to_json(vacancies: list[Vacancy], filename: str) -> None:
+def save_vacancies_to_json(vacancies: list[Vacancy], filename: Path) -> None:
     logger.info(f"Saving vacancies to '{filename}'...")
     with open(filename, "w", encoding="utf-8") as fp:
         json_str = json.dumps([vac.__dict__ for vac in vacancies], ensure_ascii=False, indent=2)
