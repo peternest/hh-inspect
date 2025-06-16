@@ -6,7 +6,10 @@ from typing import Final, Iterable
 import re
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
+
 
 from hh_inspect.console_printer import ConsolePrinter
 from hh_inspect.vacancy import Vacancy
@@ -83,3 +86,32 @@ class Analyzer:
     def filter_noise_words(string_list: list[str]) -> Iterable[str]:
         noise_words = set(["API", "IT", "quot", "and", "or", "I", "it"])
         return filter(lambda w: w not in noise_words, string_list)
+
+    def draw_plots(self) -> None:
+        printer.print("\nClose an image window to exit...")
+        fig = plt.figure("Salary Charts", figsize=(12, 6))
+
+        fig.add_subplot(2, 2, 1)
+        plt.title("Amount of salaries")
+        plt.ylabel("Salary (rub)")
+        sns.swarmplot(data=self.working_df[["salary_from", "salary_to"]].dropna(), size=5)
+
+        fig.add_subplot(2, 2, 3)
+        plt.title("Min, max and quantiles")
+        plt.ylabel("Salary (rub)")
+        sns.boxplot(data=self.working_df[["salary_from", "salary_to"]], width=0.2, native_scale=True)
+
+        fig.add_subplot(2, 2, 2)
+        plt.title("Distribution of salary_to")
+        plt.xlabel("Salary (rub)")
+        plt.grid(True)
+        sns.histplot(self.working_df["salary_to"].dropna(), bins=12, color="C1", kde=True)  # type: ignore
+
+        fig.add_subplot(2, 2, 4)
+        plt.title("Distribution of salary_from")
+        plt.xlabel("Salary (rub)")
+        plt.grid(True)
+        sns.histplot(self.working_df["salary_from"].dropna(), bins=12, color="C0", kde=True)  # type: ignore
+
+        plt.tight_layout()
+        plt.show()

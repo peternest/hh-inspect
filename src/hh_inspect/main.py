@@ -58,7 +58,9 @@ class HHInspector:
         self.analyzer.print_salary_stats()
         self.analyzer.print_top_key_skills()
         self.analyzer.print_top_words_in_description()
-        # self.analyzer.draw_plots()
+
+        if self.settings.general.draw_salary_plots:
+            self.analyzer.draw_plots()
 
     def print_vacancies(self, vacancies: list[Vacancy]) -> None:
         num_found = len(vacancies)

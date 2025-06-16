@@ -52,6 +52,7 @@ class GeneralSettings(BaseModel):
     print_output_to_console: bool = True
     save_results_to_csv: bool = True
     save_results_to_json: bool = True
+    draw_salary_plots: bool = True
 
 
 class Settings(BaseSettings):

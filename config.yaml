@@ -37,3 +37,4 @@ general:
   print_output_to_console: true
   save_results_to_csv: true
   save_results_to_json: true
+  draw_salary_plots: true
