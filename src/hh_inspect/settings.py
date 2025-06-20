@@ -20,7 +20,8 @@ EXCHANGE_RATES: Final[dict[str, float]] = {
     "BYN": 26.0,
     "KZT": 0.15,
     "CNY": 12.0
-} # fmt: on
+}
+# fmt: on
 
 logger = logging.getLogger(__name__)
 
