@@ -1,6 +1,6 @@
 import logging
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Final, LiteralString
+from typing import Any, Final
 
 import requests
 from tqdm import tqdm
@@ -13,7 +13,7 @@ from hh_inspect.vacancy import Vacancy, parse_vacancy_data
 REQUEST_TIMEOUT: Final = 5
 RESPONSE_OK: Final = 200
 
-_API_URL: Final[LiteralString] = "https://api.hh.ru/vacancies/"
+_API_URL: Final = "https://api.hh.ru/vacancies/"
 
 logger = logging.getLogger(__name__)
 printer = ConsolePrinter()
