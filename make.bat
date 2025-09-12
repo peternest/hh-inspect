@@ -23,13 +23,11 @@ goto end
 echo Running checks...
 uv run ruff check src/hh_inspect tests
 uv run pyright src/hh_inspect tests
-rem uv run mypy src/hh_inspect tests --show-error-context --pretty
 goto end
 
 :test
 echo Running tests...
 uv run pytest tests
-rem uv run pytest tests --cov=hh-inspect --cov-report=term-missing
 goto end
 
 :run
@@ -43,7 +41,6 @@ uv sync -q
 .venv\Scripts\python --version
 uv --version
 .venv\Scripts\ruff --version
-.venv\Scripts\mypy --version
 .venv\Scripts\pyright --version
 .venv\Scripts\pytest --version
 goto end
