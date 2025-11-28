@@ -64,7 +64,7 @@ class Analyzer:
         for key, value in top_skills[:print_amount]:
             printer.print(f"{key[:20]:20} {value}")
 
-    def print_top_words_in_description(self, print_amount: int = 15) -> None:
+    def print_top_words_in_description(self, print_amount: int = 10) -> None:
         top_words = self.get_top_description_words()
         printer.print(f"\nThe {print_amount} most frequently used words in Description:")
         for key, value in top_words[:print_amount]:

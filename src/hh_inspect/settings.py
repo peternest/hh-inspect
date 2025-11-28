@@ -54,6 +54,9 @@ class GeneralSettings(BaseModel):
     save_results_to_csv: bool = True
     save_results_to_json: bool = True
     draw_salary_plots: bool = True
+    print_salary_stats: bool = True
+    print_key_skills: bool = True
+    print_top_words: bool = True
 
 
 class Settings(BaseSettings):

@@ -55,16 +55,21 @@ class HHInspector:
         if self.settings.general.save_results_to_csv:
             self.analyzer.save_vacancies_to_csv(_CSV_FILENAME)
 
-        self.analyzer.print_salary_stats()
-        self.analyzer.print_top_key_skills()
-        self.analyzer.print_top_words_in_description()
+        if self.settings.general.print_salary_stats:
+            self.analyzer.print_salary_stats()
+
+        if self.settings.general.print_key_skills:
+            self.analyzer.print_top_key_skills()
+
+        if self.settings.general.print_top_words:
+            self.analyzer.print_top_words_in_description()
 
         if self.settings.general.draw_salary_plots:
             self.analyzer.draw_plots()
 
-    def print_vacancies(self, vacancies: list[Vacancy]) -> None:
+    def print_vacancies(self, vacancies: list[Vacancy], max_to_display: int = 25) -> None:
         num_found = len(vacancies)
-        num_displaying = min(num_found, 20)
+        num_displaying = min(num_found, max_to_display)
         printer.print(f"Displaying {num_displaying} of {num_found}")
         for vac in vacancies[:num_displaying]:
             printer.print(vac)

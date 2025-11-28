@@ -46,10 +46,10 @@ class Vacancy:
 
     def __repr__(self) -> str:
         return (
-            f"{self.__class__.__name__}("
-            f"{self.vacancy_id}, "
-            f"{self.employer_name[:35]:35}, {self.employer_city[:15]:15}, {self.vacancy_name[:35]:35}, "
-            f"({self.salary_from:6}, {self.salary_to:6}), {self.published_at}"
+            f"( {self.employer_name[:35]:35}, "
+            f"{self.employer_city[:15]:15}, {self.vacancy_name[:35]:35}, "
+            f"{self.experience[:8]:8}, {self.employment[:6]:6}, {self.schedule[:9]:9}, "
+            f"{self.salary_from:6}, {self.published_at}"
             f")"
         )
 
@@ -201,6 +201,21 @@ def parse_vacancy_data(vac_json: dict[str, Any]) -> FullVacancy:
             for role in data
         ]
 
+    def parse_experience() -> str:
+        # fmt: off
+        dic = {
+            "Нет опыта": "-",
+            "От 1 года до 3 лет": "1-3 года",
+            "От 3 до 6 лет": "3-6 лет",
+            "Более 6 лет": ">6 лет"
+        }
+        # fmt: on
+        exp = get_field_value(vac_json, "experience", "name")
+        res = dic.get(exp)
+        if res is None:
+            return ""
+        return res
+
     return FullVacancy(
         vacancy_id=vac_json.get("id", ""),
         vacancy_name=vac_json.get("name", ""),
@@ -213,7 +228,7 @@ def parse_vacancy_data(vac_json: dict[str, Any]) -> FullVacancy:
         description=vac_json.get("description", ""),
         employer=parse_employer(vac_json.get("employer")),
         employment=get_field_value(vac_json, "employment", "name"),
-        experience=get_field_value(vac_json, "experience", "name"),
+        experience=parse_experience(),
         key_skills=[skill["name"] for skill in vac_json.get("key_skills", [])],
         professional_roles=parse_professional_roles(vac_json.get("professional_roles")),
         salary_range=parse_salary_range(vac_json.get("salary_range")),
