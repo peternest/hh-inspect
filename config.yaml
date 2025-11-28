@@ -5,8 +5,8 @@
 # Подробнее о языке запросов для поля text читайте здесь: https://hh.ru/article/1175
 
 query:
-  text: "Python OR data OR дата"
-  excluded_text: "senior"  # какие слова исключить из поиска
+  text: "Python"  # OR data OR дата"
+  excluded_text: "senior,full"  # какие слова исключить из поиска (через запятую)
 
   # Область поиска, допустимые значения [name, company_name, description], по умолчанию "name"
   search_field: ["name"]
@@ -18,13 +18,13 @@ query:
   professional_role: ["96", "165"]  # 96 = Программист, разработчик, 165 - Дата-сайентист
 
   # Уровень дохода
-  salary: 120000  # минимальная верхняя граница зарплаты (до вычета налогов), по умолчанию 0
-  only_with_salary: true  # только вакансии, где указана зарплата
+  # salary: 100000  # минимальная верхняя граница зарплаты (до вычета налогов), по умолчанию 0
+  only_with_salary: false  # только вакансии, где указана зарплата
 
   # Опыт работы, допустимые значения [no, between1And3, between3And6, moreThan6], по умолчанию все
   experience: ["between1And3", "between3And6"]
 
-  per_page: 25  # сколько выдывать вакансий на страницу (максимум 100)
+  per_page: 25  # сколько выдавать вакансий на страницу (максимум 100)
   order_by: "publication_time"  # упорядочить вывод по дате публикации
   label: "not_from_agency"  # исключить объявления от кадровых агентств
 
@@ -37,4 +37,7 @@ general:
   print_output_to_console: true
   save_results_to_csv: true
   save_results_to_json: true
-  draw_salary_plots: true
+  draw_salary_plots: false
+  print_salary_stats: false
+  print_key_skills: true
+  print_top_words: false
