@@ -36,6 +36,7 @@ class QuerySettings(BaseModel):
     salary: int | None = None
     only_with_salary: bool = False
     experience: list[str] | None = None
+    work_format: list[str] | None = None
     per_page: int = 25
     order_by: str = "publication_time"
     label: str | None = None
