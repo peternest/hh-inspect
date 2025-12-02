@@ -5,17 +5,17 @@
 # Подробнее о языке запросов для поля text читайте здесь: https://hh.ru/article/1175
 
 query:
-  text: "Python Tableau"
-  excluded_text: "senior"  # какие слова исключить из поиска (через запятую)
+  text: "Python"  # OR data OR дата"
+  excluded_text: "senior,full,fullstack"  # какие слова исключить из поиска (через запятую)
 
   # Область поиска, допустимые значения [name, company_name, description], по умолчанию "name"
-  search_field: ["name", "description"]
+  search_field: ["name"]
 
   # Регионы, полный список здесь: https://api.hh.ru/areas/, по умолчанию "Россия"
-  area: ["113"]  # 1 = Москва, 2 = Санкт-Петербург, 113 = Россия
+  area: ["2"]  # 1 = Москва, 2 = Санкт-Петербург, 113 = Россия
 
   # Специализации, полный список здесь: https://api.hh.ru/professional_roles/, по умолчанию все
-  professional_role: ["96", "156"]  # 96 = Программист, разработчик, 156 = BI-аналитик, аналитик данных, 165 = Дата-сайентист
+  professional_role: ["96", "165"]  # 96 = Программист, разработчик, 165 - Дата-сайентист
 
   # Уровень дохода
   # salary: 100000  # минимальная верхняя граница зарплаты (до вычета налогов), по умолчанию 0
@@ -25,7 +25,7 @@ query:
   experience: ["between1And3", "between3And6"]
 
   # Режим работы, допустимые значения [ON_SITE, REMOTE, HYBRID], по умолчанию все
-  work_format: ["REMOTE"]
+  work_format: ["REMOTE", "HYBRID"]
 
   per_page: 25  # сколько выдавать вакансий на страницу (максимум 100)
   order_by: "publication_time"  # упорядочить вывод по дате публикации
