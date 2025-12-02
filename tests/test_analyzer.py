@@ -19,6 +19,7 @@ def create_vacancy(  # noqa: PLR0913
     experience: str = "from1to3",
     employment: str = "full",
     schedule: str = "remote",
+    work_format: list[str] = [],  # noqa: B006
     key_skills: list[str] = [],  # noqa: B006
     description: str = "",
     vacancy_url: str = "http://example.com/url",
@@ -36,6 +37,7 @@ def create_vacancy(  # noqa: PLR0913
         experience=experience,
         employment=employment,
         schedule=schedule,
+        work_format=work_format,
         key_skills=key_skills,
         description=description,
         vacancy_url=vacancy_url,

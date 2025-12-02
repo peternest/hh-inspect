@@ -36,13 +36,14 @@ def test_parse_vacancy_data(example_vacancy: FullVacancy) -> None:
     assert vac.employer.url == "https://api.hh.ru/employers/55555"
     assert vac.employer.accredited_it_employer is False
     assert vac.employer.trusted is True
-    assert vac.experience == "Нет опыта"
+    assert vac.experience == "-"
     assert vac.employment == "Полная занятость"
     assert vac.schedule == "Полный день"
     assert vac.key_skills == ["SQL", "Python", "Machine Learning"]
     assert len(vac.professional_roles) == 1
     assert vac.professional_roles[0].id == "96"
     assert vac.professional_roles[0].name == "Программист, разработчик"
+    assert vac.work_format == ["ON_SITE", "HYBRID"]
     assert vac.published_at == "2025-05-15T15:15:15+0300"
     assert vac.vacancy_url == "https://hh.ru/vacancy/12345"
 
@@ -58,9 +59,10 @@ def test_convert_to_basic_vacancy(example_vacancy: FullVacancy) -> None:
     assert vac.region == "Санкт-Петербург"
     assert vac.salary_from == 100000
     assert vac.salary_to == 200000
-    assert vac.experience == "Нет опыта"
+    assert vac.experience == "-"
     assert vac.employment == "Полная занятость"
     assert vac.schedule == "Полный день"
+    assert vac.work_format == ["ON_SITE", "HYBRID"]
     assert vac.key_skills == ["SQL", "Python", "Machine Learning"]
     assert vac.description.startswith("Приглашаем в команду")
     assert vac.vacancy_url == "https://hh.ru/vacancy/12345"

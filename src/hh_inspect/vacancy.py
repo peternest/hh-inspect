@@ -39,6 +39,7 @@ class Vacancy:
     experience: str
     employment: str
     schedule: str
+    work_format: list[str]
     key_skills: list[str]
     description: str
     vacancy_url: str
@@ -110,6 +111,7 @@ class FullVacancy:
     professional_roles: list[ProfessionalRole]
     salary_range: SalaryRange | None
     schedule: str
+    work_format: list[str]
     description: str = field(repr=False)
     type: str
     published_at: str
@@ -148,6 +150,7 @@ class FullVacancy:
             experience=self.experience,
             employment=self.employment,
             schedule=self.schedule,
+            work_format=self.work_format,
             key_skills=self.key_skills,
             description=remove_html_tags(self.description),
             vacancy_url=self.vacancy_url,
@@ -155,7 +158,7 @@ class FullVacancy:
         )
 
 
-def parse_vacancy_data(vac_json: dict[str, Any]) -> FullVacancy:
+def parse_vacancy_data(vac_json: dict[str, Any]) -> FullVacancy:  # noqa: C901
     def parse_address(data: dict[str, Any] | None) -> Address | None:
         if not data:
             return None
@@ -233,6 +236,7 @@ def parse_vacancy_data(vac_json: dict[str, Any]) -> FullVacancy:
         professional_roles=parse_professional_roles(vac_json.get("professional_roles")),
         salary_range=parse_salary_range(vac_json.get("salary_range")),
         schedule=get_field_value(vac_json, "schedule", "name"),
+        work_format=[wf["id"] for wf in vac_json.get("work_format", [])],
         type=get_field_value(vac_json, "type", "name"),
         published_at=vac_json.get("published_at", ""),
         vacancy_url=vac_json.get("alternate_url", ""),
