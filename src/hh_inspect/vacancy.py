@@ -46,11 +46,12 @@ class Vacancy:
     published_at: str
 
     def __repr__(self) -> str:
+        work_letters = "".join([wf[0] for wf in self.work_format])
         return (
             f"( {self.employer_name[:35]:35}, "
             f"{self.employer_city[:15]:15}, {self.vacancy_name[:35]:35}, "
             f"{self.experience[:8]:8}, {self.employment[:6]:6}, {self.schedule[:9]:9}, "
-            f"{self.salary_from:6}, {self.published_at}"
+            f"{work_letters:3}, {self.salary_from:6}, {self.published_at}"
             f")"
         )
 
