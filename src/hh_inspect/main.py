@@ -67,12 +67,17 @@ class HHInspector:
         if self.settings.general.draw_salary_plots:
             self.analyzer.draw_plots()
 
-    def print_vacancies(self, vacancies: list[Vacancy], max_to_display: int = 25) -> None:
-        num_found = len(vacancies)
-        num_displaying = min(num_found, max_to_display)
-        printer.print(f"Displaying {num_displaying} of {num_found}")
-        for vac in vacancies[:num_displaying]:
-            printer.print(vac)
+    def print_vacancies(self, vacancies: list[Vacancy]) -> None:
+        show_excluded = self.settings.general.show_excluded
+        kindof = "ALL" if show_excluded else "NOT EXCLUDED"
+        printer.print(f"Displaying {kindof} records")
+        cnt = 0
+        for vac in vacancies:
+            if show_excluded or not vac.excluded:
+                printer.print(vac)
+                cnt += 1
+                if cnt >= self.settings.general.max_to_display:
+                    break
 
 
 def main() -> None:
