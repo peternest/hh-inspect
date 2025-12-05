@@ -51,7 +51,9 @@ class FilterAfterSettings(BaseModel):
 
 class GeneralSettings(BaseModel):
     num_workers: int = 1
+    max_to_display: int = 25
     print_output_to_console: bool = True
+    show_excluded: bool = False
     save_results_to_csv: bool = True
     save_results_to_json: bool = True
     draw_salary_plots: bool = True
