@@ -44,11 +44,13 @@ class Vacancy:
     description: str
     vacancy_url: str
     published_at: str
+    excluded: bool
 
     def __repr__(self) -> str:
+        exc = "-" if self.excluded else " "
         work_letters = "".join([wf[0] for wf in self.work_format])
         return (
-            f"( {self.employer_name[:35]:35}, "
+            f"({exc} {self.employer_name[:35]:35}, "
             f"{self.employer_city[:15]:15}, {self.vacancy_name[:35]:35}, "
             f"{self.experience[:8]:8}, {self.employment[:6]:6}, {self.schedule[:9]:9}, "
             f"{work_letters:3}, {self.salary_from:6}, {self.published_at}"
@@ -118,7 +120,7 @@ class FullVacancy:
     published_at: str
     vacancy_url: str = field(repr=False)  # original 'alternate_url'
 
-    def to_basic_vacancy(self) -> Vacancy:
+    def to_basic_vacancy(self, excluded: bool = False) -> Vacancy:
         salary_from, salary_to = _extract_and_calc_salary(self.salary_range)
 
         def get_employer_name() -> str:
@@ -156,6 +158,7 @@ class FullVacancy:
             description=remove_html_tags(self.description),
             vacancy_url=self.vacancy_url,
             published_at=get_published_date(),
+            excluded=excluded,
         )
 
 

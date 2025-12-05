@@ -42,6 +42,7 @@ def create_vacancy(  # noqa: PLR0913
         description=description,
         vacancy_url=vacancy_url,
         published_at=published_at,
+        excluded=False,
     )
 
 

@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from hh_inspect.console_printer import ConsolePrinter
 from hh_inspect.settings import Settings
-from hh_inspect.vacancy import Vacancy, parse_vacancy_data
+from hh_inspect.vacancy import FullVacancy, Vacancy, parse_vacancy_data
 
 
 REQUEST_TIMEOUT: Final = 5
@@ -36,7 +36,7 @@ class DataCollector:
         url: Final = f"{_API_URL}"
         response = requests.get(url, params=self.query_params, timeout=REQUEST_TIMEOUT)
         logger.info(f"Requested '{response.url}'")
-        printer.print(f"Requested '{response.url}'")
+        # printer.print(f"Requested '{response.url}'")  # noqa: ERA001
 
         if response.status_code != RESPONSE_OK:
             logger.error(f"Response code: {response.status_code}")
@@ -69,10 +69,6 @@ class DataCollector:
         return ids
 
     def build_vacancy_list(self, vacancy_ids: list[str]) -> list[Vacancy]:
-        def company_is_ok(vacancy: Vacancy) -> bool:
-            employer_name = vacancy.employer_name.lower()
-            return not any(name.lower() in employer_name for name in self.excluded_companies)
-
         vacancy_list: list[Vacancy] = []
         with ThreadPoolExecutor(max_workers=self.num_workers) as executor:
             vacancy_list.extend(
@@ -84,12 +80,21 @@ class DataCollector:
                         ncols=100,
                         total=len(vacancy_ids),
                     )
-                    if vacancy is not None and company_is_ok(vacancy)
+                    if vacancy is not None
                 ]
             )
         return vacancy_list
 
     def get_vacancy_or_none(self, vacancy_id: str) -> Vacancy | None:
+        def get_employer_name(vac: FullVacancy) -> str:
+            if vac.employer is not None and vac.employer.name is not None:
+                return vac.employer.name
+            return ""
+
+        def is_excluded(vac: FullVacancy) -> bool:
+            employer_name = get_employer_name(vac).lower()
+            return any(name.lower() in employer_name for name in self.excluded_companies)
+
         url = f"{_API_URL}{vacancy_id}"
         try:
             response = requests.get(url, timeout=REQUEST_TIMEOUT)
@@ -101,5 +106,6 @@ class DataCollector:
 
             if response.status_code == RESPONSE_OK:
                 full_vac = parse_vacancy_data(vacancy_json)
-                return full_vac.to_basic_vacancy()
+                excluded = is_excluded(full_vac)
+                return full_vac.to_basic_vacancy(excluded)
         return None

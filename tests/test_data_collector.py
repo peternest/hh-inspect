@@ -125,6 +125,7 @@ def test_excluded_company_filtering(monkeypatch: pytest.MonkeyPatch, settings: S
         description="Some description",
         vacancy_url="http://example.com/id1",
         published_at="2025-01-01",
+        excluded=False,
     )
 
     vac2 = Vacancy(
@@ -144,6 +145,7 @@ def test_excluded_company_filtering(monkeypatch: pytest.MonkeyPatch, settings: S
         description="Other description",
         vacancy_url="http://example.com/id2",
         published_at="2025-01-02",
+        excluded=True,
     )
 
     def patch_num_pages() -> int:
