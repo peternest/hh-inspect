@@ -27,7 +27,7 @@ uv sync
 
 Запустить программу с параметрами по умолчанию:
 ```
-uv run src/hh_inspect
+uv run app
 ```
 
 Данные по найденным вакансиям сохраняются в папке `output` (файлы `vacancies.csv` и `vacancies.json`).
