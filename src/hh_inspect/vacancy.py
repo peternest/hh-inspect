@@ -270,8 +270,10 @@ def _extract_and_calc_salary(salary_range: SalaryRange | None) -> tuple[int, int
     return (salary_from, salary_to)
 
 
-def save_vacancies_to_json(vacancies: list[Vacancy], filename: Path) -> None:
+def save_vacancies_to_json(vacancies: list[Vacancy], filename: Path, show_excluded: bool) -> None:
     logger.info(f"Saving vacancies to '{filename}'...")
     with open(filename, "w", encoding="utf-8") as fp:
-        json_str = json.dumps([vac.__dict__ for vac in vacancies], ensure_ascii=False, indent=2)
+        json_str = json.dumps(
+            [vac.__dict__ for vac in vacancies if show_excluded or not vac.excluded], ensure_ascii=False, indent=2
+        )
         fp.write(f"{json_str}\n")
