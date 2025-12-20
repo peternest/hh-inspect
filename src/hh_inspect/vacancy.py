@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Final
 
 from hh_inspect.settings import EXCHANGE_RATES
-from hh_inspect.utils import get_field_value, remove_html_tags
+from hh_inspect.utils import get_field_value
 
 
 logger = logging.getLogger(__name__)
@@ -155,7 +155,8 @@ class FullVacancy:
             schedule=self.schedule,
             work_format=self.work_format,
             key_skills=self.key_skills,
-            description=remove_html_tags(self.description),
+            description=self.description,
+            # description=remove_html_tags(self.description),
             vacancy_url=self.vacancy_url,
             published_at=get_published_date(),
             excluded=excluded,
