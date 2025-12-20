@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Вакансии</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="../templates/style.css">
+</head>
+<body>
+
+<div class="container-fluid">
+<div class="row">
+<div class="col-lg-8 bg-light p-4">
+    {% for vac in data %}
+        <div id="vac-{{ loop.index }}" class="vacancy-big">{{ vac.vacancy_name }}</div>
+        <p></p>
+        <div><span class="company">{{ vac.employer_name }}</span> ({{ vac.employer_city }})</div>
+        <p></p>
+        <div class="key">Зарплата: {{ vac.salary_from }} - {{ vac.salary_to }}</div>
+        <div class="key">Опыт работы: {{ vac.experience }}</div>
+        <div class="key">{{ vac.employment }}</div>
+        <div class="key">Формат работы: {{ vac.work_format }}</div>
+        <p></p>
+        <div>{{ vac.description }}</div>
+        <p></p>
+        <div><b>Ключевые навыки:</b><br>{{ vac.key_skills }}</div>
+        <br><br><br><br>
+    {% endfor %}
+</div>
+<div class="col-lg-4 bg-primary-subtle text-primary p-4">
+    <div class="sticky-top">
+        {% for vac in data %}
+            <div class="vacancy-med"><a href="#vac-{{ loop.index }}">{{ vac.vacancy_name }}</a></div>
+            <div>{{ vac.employer_name }}</div>
+            <p></p>
+        {% endfor %}
+    </div>
+</div>
+</div>
+</div>
+
+</body>
+</html>

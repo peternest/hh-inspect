@@ -1,0 +1,19 @@
+body {
+    font-family: Roboto, Helvetica, Arial, sans-serif;
+    /*font-size: 14px;*/
+    /*margin: 20px;*/
+    line-height: 1.2;
+}
+.vacancy-big {
+    font-size: 28px;
+    font-weight: bold;
+}
+.vacancy-med {
+    font-size: 18px;
+    font-weight: bold;
+}
+.company {
+    font-size: 20px;
+    font-weight: bold;
+    color: blue;
+}
