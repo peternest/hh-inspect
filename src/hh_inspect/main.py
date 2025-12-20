@@ -5,6 +5,7 @@ from typing import Final
 from hh_inspect.analyzer import Analyzer
 from hh_inspect.console_printer import ConsolePrinter
 from hh_inspect.data_collector import DataCollector
+from hh_inspect.html_output import json_to_pretty_html
 from hh_inspect.settings import Settings, load_settings
 from hh_inspect.vacancy import Vacancy, save_vacancies_to_json
 
@@ -14,8 +15,9 @@ _ROOT_DIR: Final = Path.resolve(Path(__file__).parent.parent.parent)
 _CONFIG_FILENAME: Final = _ROOT_DIR / "config.yaml"
 
 _LOG_FILENAME: Final = _ROOT_DIR / "output/hh_inspect.log"
-_JSON_FILENAME: Final = _ROOT_DIR / "output/vacancies.json"
 _CSV_FILENAME: Final = _ROOT_DIR / "output/vacancies.csv"
+_JSON_FILENAME: Final = _ROOT_DIR / "output/vacancies.json"
+_HTML_FILENAME: Final = _ROOT_DIR / "output/vacancies.html"
 
 logging.basicConfig(
     format="[%(asctime)s - %(name)s:%(lineno)d - %(levelname)s] %(message)s",
@@ -61,6 +63,7 @@ class HHInspector:
 
         if self.settings.general.save_results_to_json:
             save_vacancies_to_json(vacancies, _JSON_FILENAME, show_excluded)
+            json_to_pretty_html(_JSON_FILENAME, _HTML_FILENAME)
 
     def analyze_vacancies(self, vacancies: list[Vacancy]) -> None:
         self.analyzer = Analyzer(vacancies, self.settings.general.show_excluded)
