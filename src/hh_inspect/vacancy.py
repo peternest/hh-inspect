@@ -1,7 +1,5 @@
-import json
 import logging
 from dataclasses import asdict, dataclass, field
-from pathlib import Path
 from typing import Any, Final
 
 from hh_inspect.settings import EXCHANGE_RATES
@@ -156,7 +154,6 @@ class FullVacancy:
             work_format=self.work_format,
             key_skills=self.key_skills,
             description=self.description,
-            # description=remove_html_tags(self.description),
             vacancy_url=self.vacancy_url,
             published_at=get_published_date(),
             excluded=excluded,
@@ -269,12 +266,3 @@ def _extract_and_calc_salary(salary_range: SalaryRange | None) -> tuple[int, int
         salary_to = int(salary_from * _FIX_SALARY_TO_COEF)
 
     return (salary_from, salary_to)
-
-
-def save_vacancies_to_json(vacancies: list[Vacancy], filename: Path, show_excluded: bool) -> None:
-    logger.info(f"Saving vacancies to '{filename}'...")
-    with open(filename, "w", encoding="utf-8") as fp:
-        json_str = json.dumps(
-            [vac.__dict__ for vac in vacancies if show_excluded or not vac.excluded], ensure_ascii=False, indent=2
-        )
-        fp.write(f"{json_str}\n")

@@ -5,9 +5,9 @@ from typing import Final
 from hh_inspect.analyzer import Analyzer
 from hh_inspect.console_printer import ConsolePrinter
 from hh_inspect.data_collector import DataCollector
-from hh_inspect.html_output import json_to_pretty_html
 from hh_inspect.settings import Settings, load_settings
-from hh_inspect.vacancy import Vacancy, save_vacancies_to_json
+from hh_inspect.vacancy import Vacancy
+from hh_inspect.vacancy_output import convert_vacancies_to_json, save_vacancies_to_html, save_vacancies_to_json
 
 
 _ROOT_DIR: Final = Path.resolve(Path(__file__).parent.parent.parent)
@@ -61,9 +61,14 @@ class HHInspector:
                 if cnt >= self.settings.general.max_to_display:
                     break
 
+    def save_vacancies_to_json_html(self, vacancies: list[Vacancy]) -> None:
+        json_str = convert_vacancies_to_json(vacancies, self.settings.general.show_excluded)
+
         if self.settings.general.save_results_to_json:
-            save_vacancies_to_json(vacancies, _JSON_FILENAME, show_excluded)
-            json_to_pretty_html(_JSON_FILENAME, _HTML_FILENAME)
+            save_vacancies_to_json(json_str, _JSON_FILENAME)
+
+        if self.settings.general.save_results_to_html:
+            save_vacancies_to_html(json_str, _HTML_FILENAME)
 
     def analyze_vacancies(self, vacancies: list[Vacancy]) -> None:
         self.analyzer = Analyzer(vacancies, self.settings.general.show_excluded)
@@ -93,4 +98,5 @@ def main() -> None:
     vacancies = hh.collect_vacancies()
     if len(vacancies):
         hh.print_vacancies(vacancies)
+        hh.save_vacancies_to_json_html(vacancies)
         hh.analyze_vacancies(vacancies)
