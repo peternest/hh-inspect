@@ -6,7 +6,7 @@
 
 query:
   text: "Python"  # OR data OR дата"
-  excluded_text: "senior,full,fullstack,QA,ML"  # какие слова исключить из поиска (через запятую)
+  excluded_text: "senior,full,fullstack,QA,ML,LLM"  # какие слова исключить из поиска (через запятую)
 
   # Область поиска, допустимые значения [name, company_name, description], по умолчанию "name"
   search_field: ["name"]
@@ -22,7 +22,7 @@ query:
   only_with_salary: false  # только вакансии, где указана зарплата
 
   # Опыт работы, допустимые значения [no, between1And3, between3And6, moreThan6], по умолчанию все
-  experience: ["between1And3"] #, "between3And6"]
+  experience: ["between1And3"]  #, "between3And6"]
 
   # Режим работы, допустимые значения [ON_SITE, REMOTE, HYBRID], по умолчанию все
   work_format: [] #"REMOTE", "HYBRID"]
@@ -33,15 +33,19 @@ query:
 
 filter_after:
   # Список названий компаний для исключения из списка после выборки
-  excluded_companies: ["СБЕР", "Северная верфь", "Алабуга", "Reinvent", "ФГУП", "Виста", "HRBotanik"] 
-
+  excluded_companies: []
+ 
 general:
   num_workers: 3
-  max_to_display: 50
+
   print_output_to_console: true
+  max_to_display: 50
   show_excluded: false
-  save_results_to_csv: true
+
+  save_results_to_csv: false
   save_results_to_json: true
+  save_results_to_html: true
+
   draw_salary_plots: false
   print_salary_stats: false
   print_key_skills: false
