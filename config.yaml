@@ -22,10 +22,10 @@ query:
   only_with_salary: false  # только вакансии, где указана зарплата
 
   # Опыт работы, допустимые значения [no, between1And3, between3And6, moreThan6], по умолчанию все
-  experience: ["between1And3"]  #, "between3And6"]
+  experience: ["between1And3"]
 
   # Режим работы, допустимые значения [ON_SITE, REMOTE, HYBRID], по умолчанию все
-  work_format: [] #"REMOTE", "HYBRID"]
+  work_format: []
 
   per_page: 25  # сколько выдавать вакансий на страницу (максимум 100)
   order_by: "publication_time"  # упорядочить вывод по дате публикации
@@ -42,8 +42,9 @@ general:
   max_to_display: 50
   show_excluded: false
 
+  output_filename: "vacancies_python"
   save_results_to_csv: false
-  save_results_to_json: true
+  save_results_to_json: false
   save_results_to_html: true
 
   draw_salary_plots: false
