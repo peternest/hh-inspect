@@ -11,13 +11,11 @@ from hh_inspect.vacancy_output import convert_vacancies_to_json, save_vacancies_
 
 
 _ROOT_DIR: Final = Path.resolve(Path(__file__).parent.parent.parent)
+_OUTPUT_DIR: Final = _ROOT_DIR / "output"
 
 _CONFIG_FILENAME: Final = _ROOT_DIR / "config.yaml"
+_LOG_FILENAME: Final = _OUTPUT_DIR / "hh_inspect.log"
 
-_LOG_FILENAME: Final = _ROOT_DIR / "output/hh_inspect.log"
-_CSV_FILENAME: Final = _ROOT_DIR / "output/vacancies.csv"
-_JSON_FILENAME: Final = _ROOT_DIR / "output/vacancies.json"
-_HTML_FILENAME: Final = _ROOT_DIR / "output/vacancies.html"
 
 logging.basicConfig(
     format="[%(asctime)s - %(name)s:%(lineno)d - %(levelname)s] %(message)s",
@@ -65,15 +63,16 @@ class HHInspector:
         json_str = convert_vacancies_to_json(vacancies, self.settings.general.show_excluded)
 
         if self.settings.general.save_results_to_json:
-            save_vacancies_to_json(json_str, _JSON_FILENAME)
+            save_vacancies_to_json(json_str, self._make_output_filename(".json"))
 
         if self.settings.general.save_results_to_html:
-            save_vacancies_to_html(json_str, _HTML_FILENAME)
+            save_vacancies_to_html(json_str, self._make_output_filename(".html"))
 
     def analyze_vacancies(self, vacancies: list[Vacancy]) -> None:
         self.analyzer = Analyzer(vacancies, self.settings.general.show_excluded)
+
         if self.settings.general.save_results_to_csv:
-            self.analyzer.save_vacancies_to_csv(_CSV_FILENAME)
+            self.analyzer.save_vacancies_to_csv(self._make_output_filename(".csv"))
 
         if self.settings.general.print_salary_stats:
             self.analyzer.print_salary_stats()
@@ -86,6 +85,9 @@ class HHInspector:
 
         if self.settings.general.draw_salary_plots:
             self.analyzer.draw_plots()
+
+    def _make_output_filename(self, extension: str) -> Path:
+        return _OUTPUT_DIR / f"{self.settings.general.output_filename}{extension}"
 
 
 def main() -> None:
