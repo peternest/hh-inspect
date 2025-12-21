@@ -64,6 +64,6 @@ def test_convert_to_basic_vacancy(example_vacancy: FullVacancy) -> None:
     assert vac.schedule == "Полный день"
     assert vac.work_format == ["ON_SITE", "HYBRID"]
     assert vac.key_skills == ["SQL", "Python", "Machine Learning"]
-    assert vac.description.startswith("Приглашаем в команду")
+    assert vac.description.startswith("<p><em><strong>Приглашаем в команду")
     assert vac.vacancy_url == "https://hh.ru/vacancy/12345"
     assert vac.published_at == "2025-05-15"

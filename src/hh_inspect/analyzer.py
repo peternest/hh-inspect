@@ -23,7 +23,7 @@ pd.set_option("display.max_colwidth", 35)
 
 
 class Analyzer:
-    def __init__(self, vacancies: list[Vacancy], show_excluded: bool) -> None:
+    def __init__(self, vacancies: list[Vacancy], show_excluded: bool = False) -> None:
         self.vacancies = vacancies
         self.working_df = pd.DataFrame([vars(v) for v in self.vacancies if show_excluded or not v.excluded])
         # print(self.working_df.dtypes)  # noqa: ERA001
