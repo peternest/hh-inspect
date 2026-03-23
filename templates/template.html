@@ -13,7 +13,9 @@
 <div class="row">
 <div class="col-lg-8 bg-light p-4">
     {% for vac in data %}
-        <div id="vac-{{ loop.index }}" class="vacancy-big">{{ vac.vacancy_name }}</div>
+        <div id="vac-{{ loop.index }}" class="vacancy-big">{{ vac.vacancy_name }} 
+            <a class="vacancy-med" href="{{ vac.vacancy_url }}" target="_blank">(link)</a>
+        </div>
         <p></p>
         <div><span class="company">{{ vac.employer_name }}</span> ({{ vac.employer_city }})</div>
         <p></p>
