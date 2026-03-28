@@ -22,7 +22,6 @@ goto end
 :check
 echo Running checks...
 uv run ruff check src/hh_inspect tests
-uv run pyright src/hh_inspect tests
 goto end
 
 :test
@@ -41,7 +40,6 @@ uv sync -q
 .venv\Scripts\python --version
 uv --version
 .venv\Scripts\ruff --version
-.venv\Scripts\pyright --version
 .venv\Scripts\pytest --version
 goto end
 

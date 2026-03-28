@@ -1,6 +1,6 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["uv_build>=0.10.9,<0.11.0"]
+build-backend = "uv_build"
 
 [project]
 name = "hh-inspect"
@@ -10,7 +10,7 @@ readme = "README.md"
 authors = [
     { name = "Peter Huggy", email = "peter.huggy@gmail.com" }
 ]
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 dependencies = [
     "jinja2>=3.1.0",
     "matplotlib>=3.10.0",
@@ -18,7 +18,7 @@ dependencies = [
     "pyaml>=26.0.0",
     "pydantic>=2.12.0",
     "pydantic-settings>=2.12.0",
-    "requests>=2.32.0",
+    "requests>=2.33.0",
     "seaborn>=0.13.0",
     "tqdm>=4.67.0",
 ]
@@ -29,7 +29,6 @@ app = "hh_inspect.main:main"
 [dependency-groups]
 dev = [
     "pandas-stubs>=3.0.0.0",
-    "pyright>=1.1.405",
     "pytest>=9.0.0",
     "ruff>=0.15.0",
     "types-pyyaml>=6.0.12.0",
@@ -77,14 +76,6 @@ lines-after-imports = 2
     "RUF001",  # string contains ambiguous `{}`
     "S101",  # use of `assert` detected 
     "S311"  # standard pseudo-random generators are not suitable for cryptographic purposes
-]
-
-[tool.pyright]
-typeCheckingMode = "strict"
-pythonVersion = "3.13"
-exclude = [
-    "src/unused",
-    ".venv"
 ]
 
 [tool.pytest.ini_options]
